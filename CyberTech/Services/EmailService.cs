@@ -16,22 +16,49 @@ namespace CyberTech.Services
         private readonly string _senderName;
         private readonly bool _enableSsl;
         private readonly bool _useDefaultCredentials;
+        private readonly bool _isConfigValid;
 
         public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
-            _configuration = configuration;
             _logger = logger;
+            _configuration = configuration;
 
             try
             {
-                _smtpServer = _configuration["EmailSettings:SmtpServer"];
-                _port = int.Parse(_configuration["EmailSettings:Port"]);
-                _senderEmail = _configuration["EmailSettings:SenderEmail"];
-                _senderPassword = _configuration["EmailSettings:SenderPassword"];
+                var emailSettings = _configuration.GetSection("EmailSettings");
+                _smtpServer = emailSettings["SmtpServer"];
+                
+                // Sửa lỗi parse SMTP_PORT
+                string portString = emailSettings["Port"];
+                if (string.IsNullOrEmpty(portString) || portString.Contains("${"))
+                {
+                    // Nếu không có giá trị hoặc là biến môi trường chưa được thay thế
+                    _port = 587; // Giá trị mặc định
+                }
+                else
+                {
+                    _port = int.Parse(portString);
+                }
+                
+                _senderEmail = emailSettings["SenderEmail"];
+                _senderPassword = emailSettings["SenderPassword"];
 
-                _senderName = _configuration["EmailSettings:SenderName"] ?? "CyberTech";
-                _enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
-                _useDefaultCredentials = bool.Parse(_configuration["EmailSettings:UseDefaultCredentials"] ?? "false");
+                // Kiểm tra cấu hình email
+                if (string.IsNullOrEmpty(_smtpServer) || _smtpServer.Contains("${") ||
+                    string.IsNullOrEmpty(_senderEmail) || _senderEmail.Contains("${") ||
+                    string.IsNullOrEmpty(_senderPassword) || _senderPassword.Contains("${"))
+                {
+                    _logger.LogWarning("Email configuration is incomplete or using placeholder values. Email functionality will be limited.");
+                    _isConfigValid = false;
+                }
+                else
+                {
+                    _isConfigValid = true;
+                }
+
+                _senderName = emailSettings["SenderName"] ?? "CyberTech";
+                _enableSsl = bool.Parse(emailSettings["EnableSsl"] ?? "true");
+                _useDefaultCredentials = bool.Parse(emailSettings["UseDefaultCredentials"] ?? "false");
 
                 _logger.LogDebug("Email configuration loaded: Server={Server}, Port={Port}, Sender={Sender}, SSL={SSL}, UseDefaultCredentials={UseDefault}",
                     _smtpServer, _port, _senderEmail, _enableSsl, _useDefaultCredentials);
@@ -42,6 +69,7 @@ namespace CyberTech.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error initializing EmailService: {Message}", ex.Message);
+                _isConfigValid = false;
                 throw new InvalidOperationException("Email configuration is invalid", ex);
             }
         }

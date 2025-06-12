@@ -73,7 +73,14 @@ builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<EmailTemplateService>();
 
 // Add background services
-builder.Services.AddHostedService<StockNotificationBackgroundService>();
+if (builder.Configuration.GetValue<bool>("DisableBackgroundServices") != true)
+{
+    builder.Services.AddHostedService<StockNotificationBackgroundService>();
+}
+else
+{
+    builder.Services.AddSingleton<IHostedService, NoOpBackgroundService>();
+}
 
 // Configure Logging
 builder.Services.AddLogging(logging =>

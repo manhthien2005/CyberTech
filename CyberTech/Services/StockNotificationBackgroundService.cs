@@ -51,7 +51,16 @@ namespace CyberTech.Services
             using (var scope = _services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                
+                // Kiểm tra xem có thể lấy EmailService không, nếu không thì bỏ qua
+                IEmailService emailService;
+                try {
+                    emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                }
+                catch (Exception ex) {
+                    _logger.LogWarning("Email service unavailable, skipping stock notifications: {Message}", ex.Message);
+                    return; // Bỏ qua xử lý thông báo nếu không có email service
+                }
 
                 // Lấy các thông báo cần xử lý - không dùng AsNoTracking() để có thể cập nhật entities
                 var notifications = await context.ProductStockNotifications
