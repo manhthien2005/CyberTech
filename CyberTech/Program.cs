@@ -35,15 +35,26 @@ builder.Services.AddDataProtection()
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    
     // Railway sử dụng PostgreSQL
     if (builder.Environment.IsProduction())
     {
-        options.UseNpgsql(connectionString);
+        var connectionString = builder.Configuration.GetConnectionString("PostgreSQLConnection") ?? 
+                              builder.Configuration.GetConnectionString("DefaultConnection") ??
+                              Environment.GetEnvironmentVariable("DATABASE_URL");
+                              
+        if (!string.IsNullOrEmpty(connectionString))
+        {
+            options.UseNpgsql(connectionString);
+            Console.WriteLine("Using PostgreSQL connection");
+        }
+        else
+        {
+            throw new InvalidOperationException("No database connection string configured for Production environment");
+        }
     }
     else
     {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         options.UseSqlServer(connectionString);
     }
     
@@ -183,6 +194,24 @@ var app = builder.Build();
 // Configure Railway port
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://0.0.0.0:{port}");
+
+// Kiểm tra kết nối database khi khởi động
+if (app.Environment.IsProduction())
+{
+    // Sử dụng Task.Run để tránh blocking startup
+    Task.Run(async () =>
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            await DatabaseSetup.InitializeDatabaseAsync(app.Services, logger);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking database: {ex.Message}");
+        }
+    });
 
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())

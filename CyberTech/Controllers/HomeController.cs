@@ -13,275 +13,60 @@ namespace CyberTech.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _logger = logger;
             _context = context;
+            _environment = environment;
         }
 
-        public IActionResult Index(int page = 1, int pageSize = 10)
+        public IActionResult Index()
         {
-            // Lấy danh sách sản phẩm với phân trang và kiểm tra dữ liệu đầy đủ
-            var products = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory != null &&
-                           p.SubSubcategory.Subcategory != null &&
-                           p.SubSubcategory.Subcategory.Category != null)
-                .OrderBy(p => p.ProductID)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            // Lấy danh sách thuộc tính quan trọng theo danh mục
-            var categoryAttributes = _context.CategoryAttributes
-                .GroupBy(ca => ca.CategoryID)
-                .ToDictionary(g => g.Key, g => g.Select(ca => ca.AttributeName).ToList());
-
-            // Tạo ProductViewModel
-            var productViewModels = products.Select(p => new ProductViewModel
+            try
             {
-                ProductID = p.ProductID,
-                Name = p.Name,
-                Price = p.Price,
-                SalePrice = p.SalePrice,
-                SalePercentage = p.SalePercentage,
-                DiscountedPrice = p.SalePrice,
-                Attributes = GetImportantAttributes(p, categoryAttributes),
-                SubSubcategory = p.SubSubcategory,
-                PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                IsInStock = p.Stock > 0,
-                Brand = p.Brand,
-                AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                ReviewCount = p.Reviews?.Count ?? 0,
-                Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                Status = p.Status ?? "Active"
-            }).ToList();
+                // Thêm logging để kiểm tra khi Railway gọi healthcheck
+                _logger.LogInformation("Home/Index endpoint called at {Time}", DateTime.Now);
 
-            // Lấy danh sách danh mục với phân cấp - Optimized với AsSplitQuery()
-            var categories = _context.Categories
-                .AsSplitQuery()
-                .Include(c => c.Subcategories)
-                .ThenInclude(s => s.SubSubcategories)
-                .Select(c => new CategoryViewModel
+                // Lấy danh sách sản phẩm nổi bật và mới nhất
+                var featuredProducts = _context.Products
+                    .Where(p => p.IsFeatured && p.IsActive && p.Stock > 0)
+                    .Include(p => p.Category)
+                    .Include(p => p.ProductImages)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Take(8)
+                    .ToList();
+
+                var newProducts = _context.Products
+                    .Where(p => p.IsActive && p.Stock > 0)
+                    .Include(p => p.Category)
+                    .Include(p => p.ProductImages)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Take(8)
+                    .ToList();
+
+                var viewModel = new HomeViewModel
                 {
-                    CategoryID = c.CategoryID,
-                    Name = c.Name,
-                    Icon = CategoryHelper.GetIconForCategory(c.Name),
-                    Url = Url.Action("Category", "Product", new { category = c.Name.ToLower().Replace(" ", "-") }),
-                    Subcategories = c.Subcategories.Select(s => new SubcategoryViewModel
-                    {
-                        SubcategoryID = s.SubcategoryID,
-                        Name = s.Name,
-                        Url = Url.Action("Subcategory", "Product", new { subcategory = s.Name.ToLower().Replace(" ", "-") }),
-                        SubSubcategories = s.SubSubcategories.Select(ss => new SubSubcategoryViewModel
-                        {
-                            SubSubcategoryID = ss.SubSubcategoryID,
-                            Name = ss.Name,
-                            Url = Url.Action("SubSubcategory", "Product", new { subSubcategory = ss.Name.ToLower().Replace(" ", "-") })
-                        }).ToList()
-                    }).ToList()
-                })
-                .ToList();
+                    FeaturedProducts = featuredProducts,
+                    NewProducts = newProducts
+                };
 
-            // Lấy sản phẩm Laptop Gaming bán chạy
-            var laptopGamingBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 2)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm Laptop Văn Phòng bán chạy
-            var laptopOfficeBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 1)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm PC Gaming bán chạy
-            var pcGamingBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 3)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm Chuột bán chạy
-            var mouseBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 10)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm Màn hình bán chạy
-            var monitorBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 8)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm Bàn phím bán chạy
-            var keyboardBestSellers = GetOptimizedProductQuery()
-                .Where(p => p.SubSubcategory.Subcategory.CategoryID == 9)
-                .OrderByDescending(p => p.ProductID)
-                .Take(10)
-                .ToList();
-
-            // Lấy sản phẩm Flash Sale (có discount)
-            var flashSaleProducts = GetOptimizedProductQuery()
-                .Where(p => (p.SalePrice.HasValue && p.SalePrice < p.Price) || 
-                           (p.SalePercentage.HasValue && p.SalePercentage > 0))
-                .OrderByDescending(p => p.SalePercentage ?? ((p.Price - (p.SalePrice ?? p.Price)) / p.Price * 100)) // Sort by discount percentage
-                .Take(15) // Lấy 15 sản phẩm flash sale
-                .ToList();
-
-            _logger.LogInformation("Flash Sale products: {0}", string.Join(", ", flashSaleProducts.Select(p => p.Name)));
-            _logger.LogInformation("Laptop Gaming bán chạy: {0}", string.Join(", ", laptopGamingBestSellers.Select(p => p.Name)));
-            _logger.LogInformation("Laptop Văn Phòng bán chạy: {0}", string.Join(", ", laptopOfficeBestSellers.Select(p => p.Name)));
-            _logger.LogInformation("PC Gaming bán chạy: {0}", string.Join(", ", pcGamingBestSellers.Select(p => p.Name)));
-            _logger.LogInformation("Chuột bán chạy: {0}", string.Join(", ", mouseBestSellers.Select(p => p.Name)));
-            _logger.LogInformation("Màn hình bán chạy: {0}", string.Join(", ", monitorBestSellers.Select(p => p.Name)));
-            _logger.LogInformation("Bàn phím bán chạy: {0}", string.Join(", ", keyboardBestSellers.Select(p => p.Name)));
-
-            var viewModel = new HomeIndexViewModel
+                return View(viewModel);
+            }
+            catch (Exception ex)
             {
-                Products = productViewModels,
-                Categories = categories,
-                FlashSaleProducts = flashSaleProducts.Select(p => new ProductViewModel
+                _logger.LogError(ex, "Error in Home/Index action");
+                
+                // Trong môi trường production, trả về view đơn giản cho healthcheck
+                if (_environment.IsProduction())
                 {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                LaptopGamingBestSellers = laptopGamingBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                LaptopOfficeBestSellers = laptopOfficeBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                PcGamingBestSellers = pcGamingBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                MouseBestSellers = mouseBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                MonitorBestSellers = monitorBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList(),
-                KeyboardBestSellers = keyboardBestSellers.Select(p => new ProductViewModel
-                {
-                    ProductID = p.ProductID,
-                    Name = p.Name,
-                    Price = p.Price,
-                    SalePrice = p.SalePrice,
-                    SalePercentage = p.SalePercentage,
-                    DiscountedPrice = p.SalePrice,
-                    Attributes = GetImportantAttributes(p, categoryAttributes),
-                    SubSubcategory = p.SubSubcategory,
-                    PrimaryImageUrl = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    PrimaryImageUrlSmall = p.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg",
-                    IsInStock = p.Stock > 0,
-                    Brand = p.Brand,
-                    AverageRating = p.Reviews?.Any() == true ? p.Reviews.Average(r => r.Rating) : 0,
-                    ReviewCount = p.Reviews?.Count ?? 0,
-                    Url = Url.Action("ProductDetail", "Product", new { id = p.ProductID }),
-                    Status = p.Status ?? "Active"
-                }).ToList()
-            };
-
-            return View(viewModel);
+                    return Content("Application is running");
+                }
+                
+                // Trong môi trường development, hiển thị lỗi
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
         }
 
         /// <summary>
