@@ -35,8 +35,19 @@ builder.Services.AddDataProtection()
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .EnableSensitiveDataLogging(false)
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    
+    // Railway sử dụng PostgreSQL
+    if (builder.Environment.IsProduction())
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
+    
+    options.EnableSensitiveDataLogging(false)
            .EnableServiceProviderCaching(true)
            .EnableDetailedErrors(false)
            .ConfigureWarnings(warnings =>
@@ -161,6 +172,10 @@ builder.Services.AddResponseCaching(options =>
 builder.Services.AddMemoryCache();
 
 var app = builder.Build();
+
+// Configure Railway port
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
