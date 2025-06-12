@@ -5,23 +5,24 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Sao chép nuget.config trước
-COPY ["nuget.config", "."]
-
-# Sao chép csproj và restore
-COPY ["CyberTech/CyberTechShop.csproj", "CyberTech/"]
-RUN dotnet restore "CyberTech/CyberTechShop.csproj" --disable-parallel
-
-# Sao chép toàn bộ source code
+# Sao chép toàn bộ source code trước
 COPY . .
 
-# Buộc restore lại trước khi build
+# Xóa các thư mục có thể gây ra vấn đề
+RUN rm -rf /src/CyberTech/bin /src/CyberTech/obj
+
+# Cấu hình NuGet
+RUN dotnet nuget locals all --clear
+
+# Restore với cờ bảo mật thấp hơn
 WORKDIR "/src/CyberTech"
-RUN dotnet restore --force
-RUN dotnet build "CyberTechShop.csproj" -c Release -o /app/build --no-restore
+RUN dotnet restore "CyberTechShop.csproj" --disable-parallel --no-cache --force
+
+# Build
+RUN dotnet build "CyberTechShop.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "CyberTechShop.csproj" -c Release -o /app/publish /p:UseAppHost=false --no-build
+RUN dotnet publish "CyberTechShop.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

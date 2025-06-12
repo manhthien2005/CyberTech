@@ -1,6 +1,8 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
+# Nếu Dockerfile chính không hoạt động, đổi thành:
+# dockerfilePath = "Dockerfile.alternative"
 
 [deploy]
 healthcheckPath = "/"

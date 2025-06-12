@@ -1,0 +1,23 @@
+# Directories
+**/.vs/
+**/.vscode/
+**/bin/
+**/obj/
+**/out/
+**/TestResults/
+**/node_modules/
+**/packages/
+**/wwwroot/lib/
+**/.idea/
+
+# Files
+**/*.user
+**/*.suo
+**/*.lock.json
+**/*.dbmdl
+**/*.jfm
+**/npm-debug.log
+**/yarn-debug.log
+**/yarn-error.log
+**/*.sln.iml
+**/*.DS_Store 
