@@ -3,8 +3,10 @@ WORKDIR /app
 
 # Copy everything
 COPY . ./
+
 # Restore as distinct layers
 RUN dotnet restore CyberTech/CyberTechShop.csproj
+
 # Build and publish a release
 RUN dotnet publish CyberTech/CyberTechShop.csproj -c Release -o out
 
@@ -12,4 +14,14 @@ RUN dotnet publish CyberTech/CyberTechShop.csproj -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/out .
-ENTRYPOINT ["dotnet", "CyberTechShop.dll"] 
+COPY startup.sh /app/startup.sh
+RUN chmod +x /app/startup.sh
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose port
+EXPOSE 8080
+
+ENTRYPOINT ["/app/startup.sh"] 

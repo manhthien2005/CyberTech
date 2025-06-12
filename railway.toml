@@ -1,11 +1,11 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+# dockerfilePath = "Dockerfile"
 # Nếu Dockerfile chính không hoạt động, đổi thành:
-# dockerfilePath = "Dockerfile.alternative"
+dockerfilePath = "Dockerfile.alternative"
 
 [deploy]
-healthcheckPath = "/"
+healthcheckPath = "/Home/Index"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10 

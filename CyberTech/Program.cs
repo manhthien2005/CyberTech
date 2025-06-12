@@ -181,10 +181,12 @@ app.Urls.Add($"http://0.0.0.0:{port}");
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    // Tắt HTTPS redirection khi chạy trên Railway
+    // app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Tắt HTTPS redirection khi chạy trên Railway
+// app.UseHttpsRedirection();
 
 // Configure MIME types
 app.UseStaticFiles(new StaticFileOptions
