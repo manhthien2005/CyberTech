@@ -1,0 +1,473 @@
+@{
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+    var title = ViewBag.Title ?? "Order Management";
+}
+@section Styles {
+    <link rel="stylesheet" href="/admin/css/order-management.css">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .status-shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .order-details-section {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .order-details-section h4 {
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            color: #333;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: 500;
+            width: 150px;
+            color: #6c757d;
+        }
+        .info-value {
+            flex-grow: 1;
+        }
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        .order-total-row {
+            font-weight: 700;
+            font-size: 1.15rem;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Quản lý đơn hàng</h1>
+    <p>Quản lý các đơn hàng của khách hàng</p>
+</div>
+
+<!-- Order Management Content -->
+<div class="order-management-container">
+    <div class="filter-card mb-4">
+        <div class="filter-card-header">
+            <h5><i class="fas fa-filter"></i> Tìm kiếm & Lọc</h5>
+        </div>
+        <div class="filter-card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <label for="orderSearchInput" class="form-label">Tìm kiếm</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="orderSearchInput"
+                            placeholder="Tìm kiếm theo mã đơn hàng">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="sortFilter" class="form-label">Sắp xếp theo</label>
+                    <select class="form-select" id="sortFilter">
+                        <option value="date_desc">Mới nhất</option>
+                        <option value="date_asc">Cũ nhất</option>
+                        <option value="id_asc">Mã đơn: Thấp-Cao</option>
+                        <option value="id_desc">Mã đơn: Cao-Thấp</option>
+                        <option value="total_asc">Tổng tiền: Thấp-Cao</option>
+                        <option value="total_desc">Tổng tiền: Cao-Thấp</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Trạng thái</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending">Chờ duyệt</option>
+                        <option value="Processing">Đang xử lý</option>
+                        <option value="Shipped">Đang giao</option>
+                        <option value="Delivered">Đã giao</option>
+                        <option value="Cancelled">Đã hủy</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row g-3 align-items-center mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Khoảng thời gian</label>
+                    <div class="d-flex align-items-center date-range-container">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-calendar-alt text-muted"></i>
+                            </span>
+                            <input type="date" class="form-control border-start-0" id="startDateFilter" placeholder="Từ ngày">
+                        </div>
+                        <div class="date-range-separator">đến</div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-calendar-alt text-muted"></i>
+                            </span>
+                            <input type="date" class="form-control border-start-0" id="endDateFilter" placeholder="Đến ngày">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Lọc nhanh</label>
+                    <select class="form-select" id="quickDateFilter">
+                        <option value="">Tùy chỉnh</option>
+                        <option value="today">Hôm nay</option>
+                        <option value="yesterday">Hôm qua</option>
+                        <option value="last7days">7 ngày qua</option>
+                        <option value="last30days">30 ngày qua</option>
+                        <option value="thisMonth">Tháng này</option>
+                        <option value="lastMonth">Tháng trước</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end" style="margin-top: 45px;">
+                    <button class="btn btn-primary w-100" id="applyFiltersBtn">
+                        <i class="fas fa-filter me-2"></i> Áp dụng bộ lọc
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-content-container">
+        <div class="order-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="orderGrid"></div>
+        </div>
+
+        <nav aria-label="Order pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="orderPagination">
+                <li class="page-item disabled" id="paginationPrev">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <div id="paginationItems" class="d-flex"></div>
+                <li class="page-item" id="paginationNext">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Edit Order Modal -->
+<div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOrderModalLabel">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Order Status Section -->
+                <div class="order-status-section">
+                    <div class="order-id-display">Đơn hàng #<span id="displayOrderId"></span></div>
+                    <div class="order-date-display">Ngày đặt: <span id="displayOrderDate"></span></div>
+                    <div class="form-group">
+                        <label for="editOrderStatus" class="form-label">Trạng thái đơn hàng</label>
+                        <select class="form-select" id="editOrderStatus" required>
+                            <option value="Pending">Chờ duyệt</option>
+                            <option value="Processing">Đang xử lý</option>
+                            <option value="Shipped">Đang giao</option>
+                            <option value="Delivered">Đã giao</option>
+                            <option value="Cancelled">Đã hủy</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <form id="editOrderForm">
+                    <input type="hidden" id="editOrderId">
+                </form>
+                
+                <!-- Order Status Timeline -->
+                <div class="order-timeline">
+                    <div class="timeline">
+                        <div class="timeline-item" data-status="Pending">
+                            <div class="timeline-point">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Chờ duyệt</h6>
+                                <p class="timeline-date"></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-status="Processing">
+                            <div class="timeline-point">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Đang xử lý</h6>
+                                <p class="timeline-date"></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-status="Shipped">
+                            <div class="timeline-point">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Đang giao</h6>
+                                <p class="timeline-date"></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-status="Delivered">
+                            <div class="timeline-point">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Đã giao</h6>
+                                <p class="timeline-date"></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item" data-status="Cancelled">
+                            <div class="timeline-point">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Đã hủy</h6>
+                                <p class="timeline-date"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-details-section">
+                    <h4><i class="fas fa-user"></i> Thông tin giao hàng</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Người nhận:</div>
+                                <div class="info-value" id="recipientName"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Số điện thoại:</div>
+                                <div class="info-value" id="recipientPhone"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Địa chỉ:</div>
+                        <div class="info-value" id="shippingAddress"></div>
+                    </div>
+                </div>
+                
+                <div class="order-details-section">
+                    <h4><i class="fas fa-shopping-cart"></i> Sản phẩm đã đặt</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsTable">
+                                <!-- Visible products will be shown here -->
+                            </tbody>
+                            <tbody id="hiddenProducts" class="collapse hidden-products">
+                                <!-- Hidden products will be shown here when expanded -->
+                            </tbody>
+                        </table>
+                        <button type="button" id="toggleProductsBtn" class="product-list-toggle d-none" data-bs-toggle="collapse" data-bs-target="#hiddenProducts">
+                            <span class="show-more-text">Xem thêm sản phẩm</span>
+                            <span class="show-less-text d-none">Thu gọn</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="order-details-section">
+                    <h4><i class="fas fa-money-bill-wave"></i> Tổng kết đơn hàng</h4>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Tổng tiền hàng:</div>
+                        <div class="order-summary-value" id="orderSubtotal"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ cấp bậc:</div>
+                        <div class="order-summary-value" id="rankDiscount"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ voucher:</div>
+                        <div class="order-summary-value" id="voucherDiscount"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ sản phẩm:</div>
+                        <div class="order-summary-value" id="productDiscount"></div>
+                    </div>
+                    <div class="order-total-row order-summary-row">
+                        <div class="order-summary-label">Tổng thanh toán:</div>
+                        <div class="order-summary-value" id="orderTotal"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-success" id="printOrderBtn">
+                    <i class="fas fa-print me-2"></i> In đơn hàng
+                </button>
+                <button type="button" class="btn btn-info text-white" id="downloadPdfBtn">
+                    <i class="fas fa-file-pdf me-2"></i> Tải PDF
+                </button>
+                <button type="button" class="btn btn-primary" id="updateOrderBtn">Cập nhật trạng thái</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Order Template -->
+<div class="d-none">
+    <div id="printOrderTemplate">
+        <div class="print-order-container">
+            <div class="print-header">
+                <div class="print-logo">
+                    <img src="/images/cybot_logo.png" alt="CyberTech Logo">
+                </div>
+                <div class="print-company-info">
+                    <h2>CyberTech</h2>
+                    <p>Địa chỉ: 8C Tống Hữu Định, Phường Thảo Điền, TP. Thủ Đức, TPHCM</p>
+                    <p>Điện thoại: 0977223517 | Email: contact@cybertech.com</p>
+                    <p>Website: www.cybertech.com</p>
+                </div>
+            </div>
+            
+            <div class="print-title">
+                <h1>HÓA ĐƠN BÁN HÀNG</h1>
+                <div class="print-order-details-row">
+                    <div>Mã đơn hàng: #<span id="printOrderId"></span></div>
+                    <div>Ngày đặt: <span id="printOrderDate"></span></div>
+                </div>
+            </div>
+            
+            <div class="print-customer-info">
+                <h3>THÔNG TIN KHÁCH HÀNG</h3>
+                <div class="print-info-grid">
+                    <div class="print-info-item">
+                        <span class="print-info-label">Tên khách hàng:</span>
+                        <span id="printCustomerName"></span>
+                    </div>
+                    <div class="print-info-item">
+                        <span class="print-info-label">Số điện thoại:</span>
+                        <span id="printCustomerPhone"></span>
+                    </div>
+                    <div class="print-info-item print-info-full">
+                        <span class="print-info-label">Địa chỉ giao hàng:</span>
+                        <span id="printCustomerAddress"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="print-order-details">
+                <h3>CHI TIẾT ĐƠN HÀNG</h3>
+                <table class="print-products-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Sản phẩm</th>
+                            <th>SL</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="printOrderItems">
+                        <!-- Order items will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="print-order-summary">
+                <table class="print-summary-table">
+                    <tr>
+                        <td>Tổng tiền hàng:</td>
+                        <td id="printSubtotal"></td>
+                    </tr>
+                    <tr>
+                        <td>Giảm giá từ cấp bậc:</td>
+                        <td id="printRankDiscount"></td>
+                    </tr>
+                    <tr>
+                        <td>Giảm giá từ voucher:</td>
+                        <td id="printVoucherDiscount"></td>
+                    </tr>
+                    <tr>
+                        <td>Giảm giá từ sản phẩm:</td>
+                        <td id="printProductDiscount"></td>
+                    </tr>
+                    <tr class="print-total">
+                        <td>Tổng thanh toán:</td>
+                        <td id="printTotal"></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="print-footer">
+                <div class="print-note">
+                    <p>Cảm ơn quý khách đã mua hàng tại CyberTech!</p>
+                    <p>Mọi thắc mắc xin vui lòng liên hệ hotline: 0977223517</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Order Modal -->
+<div class="modal fade" id="deleteOrderModal" tabindex="-1" aria-labelledby="deleteOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteOrderModalLabel">Xác nhận hủy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn hủy đơn hàng <span id="deleteOrderName" class="fw-bold"></span>?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác.</p>
+                <input type="hidden" id="deleteOrderId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteOrderBtn">Hủy đơn hàng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/admin/js/order-management.js"></script>
+}

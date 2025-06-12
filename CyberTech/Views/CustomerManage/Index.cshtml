@@ -1,0 +1,558 @@
+@{
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+    var title = ViewBag.Title ?? "Happy Kitchen";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/customer-management.css">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-suspended {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Quản lý khách hàng</h1>
+    <p>Quản lý thông tin khách hàng, xem lịch sử mua hàng và voucher</p>
+</div>
+
+<!-- Customer Management Content -->
+<div class="customer-management-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" id="addCustomerBtn" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="fas fa-plus me-2"></i> Thêm khách hàng
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="customerSearchInput"
+                    placeholder="Tìm kiếm khách hàng theo tên, email, số điện thoại...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="sortFilter">
+                <option value="date_desc">Mới nhất</option>
+                <option value="date_asc">Cũ nhất</option>
+                <option value="name_asc">Tên: A-Z</option>
+                <option value="name_desc">Tên: Z-A</option>
+                <option value="email_asc">Email: A-Z</option>
+                <option value="email_desc">Email: Z-A</option>
+                <option value="spent_desc">Chi tiêu: Cao-Thấp</option>
+                <option value="spent_asc">Chi tiêu: Thấp-Cao</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="Active">Đang hoạt động</option>
+                <option value="Inactive">Không hoạt động</option>
+                <option value="Suspended">Tạm khóa</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="customer-content-container">
+        <div class="customer-table-container">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Cấp bậc</th>
+                            <th>Đơn hàng</th>
+                            <th>Tổng chi tiêu</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTableBody">
+                        <!-- Customer data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <nav aria-label="Customer pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="customerPagination">
+                <li class="page-item disabled" id="paginationPrev">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <div id="paginationItems" class="d-flex">
+                </div>
+                <li class="page-item" id="paginationNext">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCustomerModalLabel">Thêm khách hàng mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCustomerForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveCustomerBtn">Thêm khách hàng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCustomerModalLabel">Chỉnh sửa thông tin khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab" aria-controls="info-tab-pane" aria-selected="true">Thông tin cá nhân</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address-tab-pane" type="button" role="tab" aria-controls="address-tab-pane" aria-selected="false">Địa chỉ</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="vouchers-tab" data-bs-toggle="tab" data-bs-target="#vouchers-tab-pane" type="button" role="tab" aria-controls="vouchers-tab-pane" aria-selected="false">Vouchers</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders-tab-pane" type="button" role="tab" aria-controls="orders-tab-pane" aria-selected="false">Đơn hàng</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="customerTabsContent">
+                    <!-- Personal Information Tab -->
+                    <div class="tab-pane fade show active" id="info-tab-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+                        <form id="editCustomerForm">
+                            <input type="hidden" id="editUserId">
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editName" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="editEmail" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editUsername" class="form-label">Tên đăng nhập</label>
+                                        <input type="text" class="form-control" id="editUsername" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editPhone" class="form-label">Số điện thoại</label>
+                                        <input type="text" class="form-control" id="editPhone">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editStatus" class="form-label">Trạng thái</label>
+                                        <select class="form-select" id="editStatus">
+                                            <option value="Active">Đang hoạt động</option>
+                                            <option value="Inactive">Không hoạt động</option>
+                                            <option value="Suspended">Tạm khóa</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Giới tính</label>
+                                        <div class="gender-radio-group">
+                                            <div class="gender-radio">
+                                                <input type="radio" id="male" name="gender" value="1">
+                                                <label for="male">Nam</label>
+                                            </div>
+                                            <div class="gender-radio">
+                                                <input type="radio" id="female" name="gender" value="2">
+                                                <label for="female">Nữ</label>
+                                            </div>
+                                            <div class="gender-radio">
+                                                <input type="radio" id="other" name="gender" value="">
+                                                <label for="other">Không xác định</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="editDateOfBirth" class="form-label">Ngày sinh</label>
+                                        <input type="date" class="form-control" id="editDateOfBirth">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Cấp bậc</label>
+                                        <div id="customerRankInfo"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ngày tham gia</label>
+                                        <div id="customerJoinDate"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tổng chi tiêu</label>
+                                        <div id="customerTotalSpent"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Số đơn hàng</label>
+                                        <div id="customerOrderCount"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Address Tab -->
+                    <div class="tab-pane fade" id="address-tab-pane" role="tabpanel" aria-labelledby="address-tab" tabindex="0">
+                        <div id="addressList" class="mt-3">
+                            <!-- Empty state message -->
+                            <p class="text-center">Khách hàng chưa có địa chỉ nào</p>
+                        </div>
+                    </div>
+
+                    <!-- Vouchers Tab -->
+                    <div class="tab-pane fade" id="vouchers-tab-pane" role="tabpanel" aria-labelledby="vouchers-tab" tabindex="0">
+                        <div class="vouchers-summary card mt-3 mb-3" style="font-size: 0.9rem; padding: 10px;">
+                            <div class="card-body" style="padding: 15px;">
+                                <div class="row">
+                                    <div class="col-md-4 col-4 text-center">
+                                        <div class="voucher-stat" style="padding: 5px;">
+                                            <i class="fas fa-ticket-alt text-primary" style="font-size: 1.5rem;"></i>
+                                            <h4 id="totalVouchersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Tổng số voucher</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-4 text-center">
+                                        <div class="voucher-stat" style="padding: 5px;">
+                                            <i class="fas fa-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                            <h4 id="activeVouchersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Voucher khả dụng</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-4 text-center">
+                                        <div class="voucher-stat" style="padding: 5px;">
+                                            <i class="fas fa-times-circle text-muted" style="font-size: 1.5rem;"></i>
+                                            <h4 id="usedVouchersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Đã sử dụng</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mb-2">
+                            <button class="btn btn-outline-primary btn-sm" id="addVoucherToCustomerBtn" style="padding: 5px 10px;">
+                                <i class="fas fa-plus me-1"></i> Gán voucher
+                            </button>
+                        </div>
+                        
+                        <div class="vouchers-filter-bar mb-2" style="font-size: 0.85rem;">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Voucher filters" style="box-shadow: none;">
+                                <button type="button" class="btn btn-outline-secondary active" data-filter="all" style="padding: 5px 10px;">Tất cả</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="active" style="padding: 5px 10px;">Còn hiệu lực</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="used" style="padding: 5px 10px;">Đã sử dụng</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="expired" style="padding: 5px 10px;">Hết hiệu lực</button>
+                            </div>
+                        </div>
+                        
+                        <div id="vouchersList" class="voucher-list" style="max-height: 300px; overflow-y: auto; gap: 10px;">
+                            <!-- Empty state message -->
+                            <p class="text-center">Khách hàng chưa có voucher nào</p>
+                        </div>
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div class="tab-pane fade" id="orders-tab-pane" role="tabpanel" aria-labelledby="orders-tab" tabindex="0">
+                        <div class="orders-summary card mt-3 mb-3" style="font-size: 0.9rem; padding: 10px;">
+                            <div class="card-body" style="padding: 15px;">
+                                <div class="row">
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="order-stat" style="padding: 5px;">
+                                            <i class="fas fa-shopping-cart text-primary" style="font-size: 1.5rem;"></i>
+                                            <h4 id="totalOrdersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Tổng đơn hàng</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="order-stat" style="padding: 5px;">
+                                            <i class="fas fa-check-circle text-success" style="font-size: 1.5rem;"></i>
+                                            <h4 id="completedOrdersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Đơn thành công</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="order-stat" style="padding: 5px;">
+                                            <i class="fas fa-hourglass-half text-warning" style="font-size: 1.5rem;"></i>
+                                            <h4 id="processingOrdersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Đơn đang xử lý</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-center">
+                                        <div class="order-stat" style="padding: 5px;">
+                                            <i class="fas fa-ban text-danger" style="font-size: 1.5rem;"></i>
+                                            <h4 id="cancelledOrdersCount" style="font-size: 1.4rem; margin: 5px 0;">0</h4>
+                                            <p style="font-size: 0.8rem; margin: 0;">Đơn đã hủy</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="orders-filter-bar mb-2" style="font-size: 0.85rem;">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Order filters" style="box-shadow: none;">
+                                <button type="button" class="btn btn-outline-secondary active" data-filter="all" style="padding: 5px 10px;">Tất cả</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="Pending" style="padding: 5px 10px;">Chờ xác nhận</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="Processing" style="padding: 5px 10px;">Đang xử lý</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="Shipped" style="padding: 5px 10px;">Đang giao</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="Delivered" style="padding: 5px 10px;">Đã giao</button>
+                                <button type="button" class="btn btn-outline-secondary" data-filter="Cancelled" style="padding: 5px 10px;">Đã hủy</button>
+                            </div>
+                        </div>
+                        
+                        <div id="ordersList" class="order-list mt-2" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Empty state message -->
+                            <p class="text-center">Khách hàng chưa có đơn hàng nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="updateCustomerBtn">Cập nhật thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Customer Modal -->
+<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-labelledby="deleteCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCustomerModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn vô hiệu hóa tài khoản của khách hàng <span id="deleteCustomerName" class="fw-bold"></span>?</p>
+                <p class="text-danger">Tài khoản sẽ bị chuyển sang trạng thái không hoạt động và khách hàng sẽ không thể đăng nhập.</p>
+                <input type="hidden" id="deleteCustomerId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteCustomerBtn">Vô hiệu hóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Voucher to Customer Modal -->
+<div class="modal fade" id="addVoucherToCustomerModal" tabindex="-1" aria-labelledby="addVoucherToCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVoucherToCustomerModalLabel">Gán voucher cho khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <p>Chọn voucher để gán cho khách hàng <span id="voucherCustomerName" class="fw-bold"></span>:</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã voucher</th>
+                                <th>Mô tả</th>
+                                <th>Giá trị</th>
+                                <th>Hiệu lực đến</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="availableVouchersTableBody">
+                            <!-- Available vouchers will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" id="voucherCustomerId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="order-details-header">
+                    <h5>Đơn hàng #<span id="orderIdDetail"></span></h5>
+                    <p class="text-muted">Ngày đặt: <span id="orderDateDetail"></span></p>
+                    <span id="orderStatusDetail" class="order-status-badge"></span>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="order-details-section">
+                    <h6>Thông tin giao hàng</h6>
+                    <div class="info-row">
+                        <div class="info-label">Người nhận:</div>
+                        <div class="info-value" id="recipientNameDetail"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Số điện thoại:</div>
+                        <div class="info-value" id="recipientPhoneDetail"></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Địa chỉ:</div>
+                        <div class="info-value" id="shippingAddressDetail"></div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-details-section">
+                    <h6>Sản phẩm đã đặt</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsTableBody">
+                                <!-- Order items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-details-section">
+                    <h6>Tổng kết đơn hàng</h6>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Tổng tiền hàng:</div>
+                        <div class="order-summary-value" id="orderSubtotalDetail"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ cấp bậc thành viên:</div>
+                        <div class="order-summary-value" id="rankDiscountDetail"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ voucher:</div>
+                        <div class="order-summary-value" id="voucherDiscountDetail"></div>
+                    </div>
+                    <div class="order-summary-row">
+                        <div class="order-summary-label">Giảm giá từ sản phẩm:</div>
+                        <div class="order-summary-value" id="productDiscountDetail"></div>
+                    </div>
+                    <div class="order-total-row order-summary-row">
+                        <div class="order-summary-label">Tổng tiền thanh toán:</div>
+                        <div class="order-summary-value" id="orderTotalDetail"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/customer-management.js"></script>
+} 

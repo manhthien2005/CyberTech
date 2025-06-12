@@ -1,0 +1,291 @@
+@{
+    ViewBag.Title = "Tuyển dụng - CybotEcom";
+}
+
+<div class="careers-page">
+    <div class="container">
+        <h1 class="page-title">Cơ hội nghề nghiệp</h1>
+        
+        <div class="careers-content">
+            <div class="section">
+                <h2>Tại sao chọn CybotEcom?</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <i class="fas fa-rocket"></i>
+                        <h3>Môi trường năng động</h3>
+                        <p>Làm việc trong môi trường trẻ trung, sáng tạo</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>Phát triển bản thân</h3>
+                        <p>Cơ hội học hỏi và thăng tiến không ngừng</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Đãi ngộ hấp dẫn</h3>
+                        <p>Lương thưởng cạnh tranh, phúc lợi đầy đủ</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-users"></i>
+                        <h3>Đồng đội tuyệt vời</h3>
+                        <p>Làm việc với đội ngũ chuyên nghiệp</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Vị trí đang tuyển</h2>
+                <div class="jobs-list">
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h3>Nhân viên kinh doanh</h3>
+                            <span class="job-type">Full-time</span>
+                        </div>
+                        <div class="job-details">
+                            <p><i class="fas fa-map-marker-alt"></i> TP. HCM</p>
+                            <p><i class="fas fa-money-bill-wave"></i> 8-15 triệu</p>
+                        </div>
+                        <div class="job-description">
+                            <h4>Mô tả công việc:</h4>
+                            <ul>
+                                <li>Tư vấn và bán sản phẩm công nghệ</li>
+                                <li>Chăm sóc khách hàng</li>
+                                <li>Báo cáo doanh số</li>
+                            </ul>
+                            <h4>Yêu cầu:</h4>
+                            <ul>
+                                <li>Tốt nghiệp Cao đẳng trở lên</li>
+                                <li>Kinh nghiệm bán hàng 1 năm</li>
+                                <li>Đam mê công nghệ</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="btn btn-primary">Ứng tuyển ngay</a>
+                    </div>
+
+                    <div class="job-card">
+                        <div class="job-header">
+                            <h3>Kỹ thuật viên</h3>
+                            <span class="job-type">Full-time</span>
+                        </div>
+                        <div class="job-details">
+                            <p><i class="fas fa-map-marker-alt"></i> TP. HCM</p>
+                            <p><i class="fas fa-money-bill-wave"></i> 10-18 triệu</p>
+                        </div>
+                        <div class="job-description">
+                            <h4>Mô tả công việc:</h4>
+                            <ul>
+                                <li>Sửa chữa thiết bị điện tử</li>
+                                <li>Kiểm tra chất lượng sản phẩm</li>
+                                <li>Hỗ trợ khách hàng kỹ thuật</li>
+                            </ul>
+                            <h4>Yêu cầu:</h4>
+                            <ul>
+                                <li>Tốt nghiệp Đại học chuyên ngành</li>
+                                <li>Kinh nghiệm 2 năm</li>
+                                <li>Chứng chỉ kỹ thuật</li>
+                            </ul>
+                        </div>
+                        <a href="#" class="btn btn-primary">Ứng tuyển ngay</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Quy trình tuyển dụng</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Nộp hồ sơ</h3>
+                        <p>Gửi CV qua email hoặc form online</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Phỏng vấn</h3>
+                        <p>Phỏng vấn trực tiếp với HR và quản lý</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Thử việc</h3>
+                        <p>Thử việc 1-2 tháng</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Chính thức</h3>
+                        <p>Ký hợp đồng và bắt đầu công việc</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .careers-page {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .benefit-item {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .benefit-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .benefit-item i {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .benefit-item h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .jobs-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .job-type {
+            background: #e3f2fd;
+            color: #007bff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .job-details {
+            margin-bottom: 20px;
+        }
+
+        .job-details p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .job-details i {
+            color: #007bff;
+            margin-right: 10px;
+        }
+
+        .job-description h4 {
+            color: #2c3e50;
+            margin: 15px 0 10px;
+        }
+
+        .job-description ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .job-description ul li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .job-description ul li:before {
+            content: "•";
+            color: #007bff;
+            position: absolute;
+            left: 0;
+        }
+
+        .btn-primary {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+    </style>
+} 

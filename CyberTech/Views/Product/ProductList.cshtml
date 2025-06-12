@@ -1,0 +1,569 @@
+@model CyberTech.ViewModels.ProductListViewModel
+@using CyberTech.Helpers
+@{
+    ViewBag.Title = Model.CategoryName;
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/product-list.css">
+    @* <link rel="stylesheet" href="~/css/HomePage_Layout/styles.css"> *@
+}
+
+<div class="product-list-page">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <ol class="breadcrumb-list">
+            <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+            @{
+                var breadcrumbParts = Model.BreadcrumbPath?.Split(" / ") ?? new string[0];
+                for (int i = 0; i < breadcrumbParts.Length; i++)
+                {
+                    if (i == breadcrumbParts.Length - 1)
+                    {
+                        <li class="active">@breadcrumbParts[i]</li>
+                    }
+                    else
+                    {
+                        <li><span>@breadcrumbParts[i]</span></li>
+                    }
+                }
+            }
+        </ol>
+    </nav>
+
+    <div class="page-header">
+        <h1 class="page-title">@Model.CategoryName</h1>
+        <div class="result-info">
+            <span>Hiển thị @((Model.CurrentPage - 1) * Model.Filter.PageSize + 1) - @Math.Min(Model.CurrentPage * Model.Filter.PageSize, Model.TotalProducts) trong số @Model.TotalProducts sản phẩm</span>
+        </div>
+    </div>
+
+    <div class="product-content">
+        <!-- Sidebar Filter -->
+        <aside class="filter-sidebar">
+            <div class="filter-header">
+                <h3>Bộ lọc</h3>
+                <button type="button" class="clear-all-filters">Xóa tất cả</button>
+            </div>
+
+            <form id="filterForm" method="get">
+                <!-- Hidden inputs để giữ giá trị hiện tại -->
+                <input type="hidden" name="CategoryId" value="@Model.Filter.CategoryId" />
+                <input type="hidden" name="SubcategoryId" value="@Model.Filter.SubcategoryId" />
+                <input type="hidden" name="SubSubcategoryId" value="@Model.Filter.SubSubcategoryId" />
+                <input type="hidden" name="SearchQuery" value="@Model.Filter.SearchQuery" />
+                <input type="hidden" name="Page" value="1" />
+                
+                @* Hidden inputs để binding attributes hiện tại *@
+                @{
+                    int attrIndex = 0;
+                }
+                @foreach (var attr in Model.Filter.Attributes)
+                {
+                    <input type="hidden" name="Attributes[@attrIndex].Key" value="@attr.Key" />
+                    <input type="hidden" name="Attributes[@attrIndex].Value" value="@attr.Value" />
+                    attrIndex++;
+                }
+
+                <!-- Lọc theo thuộc tính category -->
+                @if (Model.CategoryAttributes.Any())
+                {
+                    @foreach (var categoryAttribute in Model.CategoryAttributes)
+                    {
+                        var attrName = categoryAttribute.AttributeName;
+                        var displayName = categoryAttribute.DisplayName;
+                        var lowercaseDisplayName = displayName.ToLower();
+                        
+                        <div class="filter-group">
+                            <h4 class="filter-title">
+                                <i class="@IconHelper.GetFontAwesomeClass(attrName)" style="margin-right: 8px; color: #007bff;"></i>
+                                @displayName
+                            </h4>
+                            <div class="attribute-filter-container">
+                                <div class="selected-attribute-display" onclick="toggleAttributeDropdown('@attrName')">
+                                    <span class="selected-text">
+                                        @{
+                                            var selectedValue = categoryAttribute.Values.FirstOrDefault(v => v.IsSelected);
+                                        }
+                                        @if (selectedValue != null)
+                                        {
+                                            @selectedValue.DisplayText
+                                            <small>(@selectedValue.ProductCount sản phẩm)</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="placeholder">Chọn @lowercaseDisplayName</span>
+                                        }
+                                    </span>
+                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                                
+                                <div class="attribute-dropdown" id="dropdown-@attrName">
+                                    <div class="dropdown-header">
+                                        <span>
+                                            <i class="@IconHelper.GetFontAwesomeClass(attrName)" style="margin-right: 8px; color: #007bff;"></i>
+                                            Chọn @displayName
+                                        </span>
+                                        @if (categoryAttribute.Values.Any(v => v.IsSelected))
+                                        {
+                                            <button type="button" class="clear-selection" onclick="clearAttributeSelection('@attrName')">Xóa</button>
+                                        }
+                                    </div>
+                                    <div class="dropdown-content">
+                                        @foreach (var value in categoryAttribute.Values)
+                                        {
+                                            var valueName = value.Value;
+                                            var valueDisplayText = value.DisplayText;
+                                            var valueProductCount = value.ProductCount;
+                                            var valueIsSelected = value.IsSelected;
+                                            
+                                            <label class="dropdown-option @(valueIsSelected ? "selected" : "")" onclick="selectAttributeValue('@attrName', '@valueName', '@valueDisplayText', @valueProductCount)">
+                                                <input type="radio" 
+                                                       name="attribute_@attrName" 
+                                                       value="@valueName" 
+                                                       @(valueIsSelected ? "checked" : "") />
+                                                <div class="option-content">
+                                                    <span class="option-text">@valueDisplayText</span>
+                                                    <span class="option-count">@valueProductCount</span>
+                                                </div>
+                                                @if (valueIsSelected)
+                                                {
+                                                    <i class="fas fa-check option-check"></i>
+                                                }
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+
+                <!-- Lọc theo giá -->
+                <div class="filter-group">
+                    <h4 class="filter-title">Khoảng giá</h4>
+                    <div class="price-range">
+                        <div class="price-inputs">
+                            <input type="text" name="MinPriceDisplay" placeholder="Từ" value="@((Model.Filter.MinPrice ?? Model.MinPrice).ToString("N0")) đ" class="price-input" data-min="@Model.MinPrice.ToString("0")" data-max="@Model.MaxPrice.ToString("0")" />
+                            <input type="hidden" name="MinPrice" value="@Model.Filter.MinPrice" />
+                            <span>-</span>
+                            <input type="text" name="MaxPriceDisplay" placeholder="Đến" value="@((Model.Filter.MaxPrice ?? Model.MaxPrice).ToString("N0")) đ" class="price-input" data-min="@Model.MinPrice.ToString("0")" data-max="@Model.MaxPrice.ToString("0")" />
+                            <input type="hidden" name="MaxPrice" value="@Model.Filter.MaxPrice" />
+                        </div>
+                        <div class="price-range-slider">
+                            <input type="range" id="priceRangeMin" min="@Model.MinPrice.ToString("0")" max="@Model.MaxPrice.ToString("0")" value="@((Model.Filter.MinPrice ?? Model.MinPrice).ToString("0"))" />
+                            <input type="range" id="priceRangeMax" min="@Model.MinPrice.ToString("0")" max="@Model.MaxPrice.ToString("0")" value="@((Model.Filter.MaxPrice ?? Model.MaxPrice).ToString("0"))" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lọc theo tình trạng -->
+                <div class="filter-group">
+                    <h4 class="filter-title">Tình trạng</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="HasDiscount" value="true" @(Model.Filter.HasDiscount == true ? "checked" : "") />
+                            <span>Đang khuyến mãi</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="apply-filter-btn">Áp dụng bộ lọc</button>
+            </form>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="product-main">
+            <!-- Sort and View Options -->
+            <div class="product-toolbar">
+                <div class="sort-options">
+                    <label>Sắp xếp theo:</label>
+                    <select name="sortBy" id="sortSelect" onchange="updateSort()">
+                        @{
+                            var sortOptions = new List<(string Value, string Text, bool Selected)>
+                            {
+                                ("name", "Tên A-Z", Model.Filter.SortBy == "name" && Model.Filter.SortOrder != "desc"),
+                                ("price", "Giá thấp đến cao", Model.Filter.SortBy == "price" && Model.Filter.SortOrder != "desc"),
+                                ("price-desc", "Giá cao đến thấp", Model.Filter.SortBy == "price" && Model.Filter.SortOrder == "desc"),
+                                ("newest", "Mới nhất", Model.Filter.SortBy == "newest"),
+                                ("rating", "Đánh giá cao nhất", Model.Filter.SortBy == "rating"),
+                                ("bestseller", "Bán chạy nhất", Model.Filter.SortBy == "bestseller")
+                            };
+                        }
+                        @foreach (var option in sortOptions)
+                        {
+                            if (option.Selected)
+                            {
+                                <option value="@option.Value" selected>@option.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            @if (Model.Products.Any())
+            {
+                <div class="products-grid">
+                    @foreach (var product in Model.Products)
+                    {
+                        <partial name="~/Views/Shared/_ProductCard.cshtml" model="product" />
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="pagination-nav">
+                        <ul class="pagination">
+                            @if (Model.CurrentPage > 1)
+                            {
+                                <li><a href="?@Html.Raw(Context.Request.QueryString.Value?.Replace($"Page={Model.CurrentPage}", $"Page={Model.CurrentPage - 1}") ?? $"Page={Model.CurrentPage - 1}")" class="page-link">‹ Trước</a></li>
+                            }
+
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="@(i == Model.CurrentPage ? "active" : "")">
+                                    <a href="?@Html.Raw(Context.Request.QueryString.Value?.Replace($"Page={Model.CurrentPage}", $"Page={i}") ?? $"Page={i}")" class="page-link">@i</a>
+                                </li>
+                            }
+
+                            @if (Model.CurrentPage < Model.TotalPages)
+                            {
+                                <li><a href="?@Html.Raw(Context.Request.QueryString.Value?.Replace($"Page={Model.CurrentPage}", $"Page={Model.CurrentPage + 1}") ?? $"Page={Model.CurrentPage + 1}")" class="page-link">Sau ›</a></li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="no-products">
+                    <i class="fas fa-search"></i>
+                    <h3>Không tìm thấy sản phẩm</h3>
+                    <p>Hãy thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác.</p>
+                </div>
+            }
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Cập nhật sắp xếp
+        function updateSort() {
+            const sortValue = document.getElementById('sortSelect').value;
+            const [sortBy, sortOrder] = sortValue.includes('-') ? sortValue.split('-') : [sortValue, 'asc'];
+            
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = window.location.pathname;
+            
+            // Thêm tất cả tham số hiện tại
+            const params = new URLSearchParams(window.location.search);
+            params.set('SortBy', sortBy);
+            params.set('SortOrder', sortOrder === 'desc' ? 'desc' : 'asc');
+            params.set('Page', '1');
+            
+            for (const [key, value] of params) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Attribute dropdown functionality
+        function toggleAttributeDropdown(attributeName) {
+            const dropdown = document.getElementById(`dropdown-${attributeName}`);
+            const display = dropdown.previousElementSibling;
+            
+            // Close other dropdowns
+            document.querySelectorAll('.attribute-dropdown').forEach(dd => {
+                if (dd !== dropdown) {
+                    dd.classList.remove('show');
+                    dd.previousElementSibling.classList.remove('active');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('show');
+            display.classList.toggle('active');
+        }
+
+        function selectAttributeValue(attributeName, value, displayText, productCount) {
+            // Simple selection without triggering events
+            const dropdown = document.getElementById(`dropdown-${attributeName}`);
+            const display = dropdown.previousElementSibling;
+            const selectedText = display.querySelector('.selected-text');
+            
+            // Check the selected radio and uncheck others
+            const allRadios = dropdown.querySelectorAll(`input[name="attribute_${attributeName}"]`);
+            allRadios.forEach(radio => {
+                radio.checked = (radio.value === value);
+            });
+            
+            // Update display
+            selectedText.innerHTML = `${displayText} <small>(${productCount} sản phẩm)</small>`;
+            
+            // Close dropdown
+            dropdown.classList.remove('show');
+            display.classList.remove('active');
+            
+            // Update selected states visually
+            dropdown.querySelectorAll('.dropdown-option').forEach(option => {
+                option.classList.remove('selected');
+                const check = option.querySelector('.option-check');
+                if (check) check.remove();
+            });
+            
+            const selectedOption = dropdown.querySelector(`input[value="${value}"]`).closest('.dropdown-option');
+            selectedOption.classList.add('selected');
+            selectedOption.innerHTML += '<i class="fas fa-check option-check"></i>';
+        }
+
+        function clearAttributeSelection(attributeName) {
+            const dropdown = document.getElementById(`dropdown-${attributeName}`);
+            const display = dropdown.previousElementSibling;
+            const selectedText = display.querySelector('.selected-text');
+            
+            // Uncheck radio
+            const radio = dropdown.querySelector(`input[name="attribute_${attributeName}"]:checked`);
+            if (radio) {
+                radio.checked = false;
+            }
+            
+            // Reset display
+            const filterTitle = dropdown.closest('.filter-group').querySelector('.filter-title').textContent;
+            selectedText.innerHTML = `<span class="placeholder">Chọn ${filterTitle.toLowerCase()}</span>`;
+            
+            // Remove clear button
+            const clearButton = dropdown.querySelector('.clear-selection');
+            if (clearButton) {
+                clearButton.remove();
+            }
+            
+            // Update dropdown options
+            dropdown.querySelectorAll('.dropdown-option').forEach(option => {
+                option.classList.remove('selected');
+                const check = option.querySelector('.option-check');
+                if (check) check.remove();
+            });
+            
+            // Close dropdown
+            dropdown.classList.remove('show');
+            display.classList.remove('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.attribute-filter-container')) {
+                document.querySelectorAll('.attribute-dropdown.show').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                    dropdown.previousElementSibling.classList.remove('active');
+                });
+            }
+        });
+
+        // Handle form submission - simple approach
+        document.getElementById('filterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Build URL with parameters
+            const newUrl = new URL(window.location.pathname, window.location.origin);
+            
+            // Add basic filter parameters
+            const categoryId = document.querySelector('input[name="CategoryId"]')?.value;
+            const subcategoryId = document.querySelector('input[name="SubcategoryId"]')?.value;
+            const subSubcategoryId = document.querySelector('input[name="SubSubcategoryId"]')?.value;
+            const searchQuery = document.querySelector('input[name="SearchQuery"]')?.value;
+            
+            if (categoryId) newUrl.searchParams.set('CategoryId', categoryId);
+            if (subcategoryId) newUrl.searchParams.set('SubcategoryId', subcategoryId);
+            if (subSubcategoryId) newUrl.searchParams.set('SubSubcategoryId', subSubcategoryId);
+            if (searchQuery) newUrl.searchParams.set('SearchQuery', searchQuery);
+            
+            // Add price range
+            const minPrice = document.querySelector('input[name="MinPrice"]')?.value;
+            const maxPrice = document.querySelector('input[name="MaxPrice"]')?.value;
+            if (minPrice && minPrice !== '') newUrl.searchParams.set('MinPrice', minPrice);
+            if (maxPrice && maxPrice !== '') newUrl.searchParams.set('MaxPrice', maxPrice);
+            
+            // Add discount filter
+            const hasDiscount = document.querySelector('input[name="HasDiscount"]:checked');
+            if (hasDiscount) newUrl.searchParams.set('HasDiscount', 'true');
+            
+            // Add selected attributes by checking which ones are visually selected
+            document.querySelectorAll('.attribute-filter-container').forEach(container => {
+                const dropdown = container.querySelector('.attribute-dropdown');
+                const attributeName = dropdown.id.replace('dropdown-', '');
+                const selectedOption = dropdown.querySelector('.dropdown-option.selected input');
+                
+                if (selectedOption) {
+                    newUrl.searchParams.set(attributeName, selectedOption.value);
+                }
+            });
+            
+            // Reset page to 1
+            newUrl.searchParams.set('Page', '1');
+            
+            window.location.href = newUrl.toString();
+        });
+
+        // Xóa tất cả bộ lọc
+        document.querySelector('.clear-all-filters').addEventListener('click', function() {
+            // Tạo URL mới chỉ giữ lại các tham số cần thiết
+            const currentUrl = new URL(window.location);
+            const newUrl = new URL(window.location.pathname, window.location.origin);
+            
+            // Chỉ giữ lại CategoryId, SubcategoryId, SubSubcategoryId, SearchQuery nếu có
+            if (currentUrl.searchParams.get('CategoryId')) {
+                newUrl.searchParams.set('CategoryId', currentUrl.searchParams.get('CategoryId'));
+            }
+            if (currentUrl.searchParams.get('SubcategoryId')) {
+                newUrl.searchParams.set('SubcategoryId', currentUrl.searchParams.get('SubcategoryId'));
+            }
+            if (currentUrl.searchParams.get('SubSubcategoryId')) {
+                newUrl.searchParams.set('SubSubcategoryId', currentUrl.searchParams.get('SubSubcategoryId'));
+            }
+            if (currentUrl.searchParams.get('SearchQuery')) {
+                newUrl.searchParams.set('SearchQuery', currentUrl.searchParams.get('SearchQuery'));
+            }
+            
+            // Redirect tới URL mới
+            window.location.href = newUrl.toString();
+        });
+
+        // Reset form khi xóa tất cả bộ lọc
+        function resetAllFilters() {
+            // Reset form inputs
+            const form = document.getElementById('filterForm');
+            if (form) {
+                // Reset radio buttons
+                const radioButtons = form.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach(radio => radio.checked = false);
+                
+                // Reset checkboxes
+                const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => checkbox.checked = false);
+                
+                // Reset price range về giá trị mặc định
+                if (minSlider && maxSlider && minDisplayInput && maxDisplayInput) {
+                    const defaultMin = minSlider.getAttribute('min');
+                    const defaultMax = maxSlider.getAttribute('max');
+                    
+                    minSlider.value = defaultMin;
+                    maxSlider.value = defaultMax;
+                    minInput.value = defaultMin;
+                    maxInput.value = defaultMax;
+                    minDisplayInput.value = formatCurrency(parseInt(defaultMin));
+                    maxDisplayInput.value = formatCurrency(parseInt(defaultMax));
+                }
+                
+                // Reset sort về mặc định
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) {
+                    sortSelect.value = 'name';
+                }
+            }
+        }
+
+        // Price range slider
+        const minSlider = document.getElementById('priceRangeMin');
+        const maxSlider = document.getElementById('priceRangeMax');
+        const minInput = document.querySelector('input[name="MinPrice"]');
+        const maxInput = document.querySelector('input[name="MaxPrice"]');
+        const minDisplayInput = document.querySelector('input[name="MinPriceDisplay"]');
+        const maxDisplayInput = document.querySelector('input[name="MaxPriceDisplay"]');
+
+        // Format number to Vietnamese currency
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('vi-VN').format(number) + ' đ';
+        }
+
+        // Parse currency string to number
+        function parseCurrency(currencyString) {
+            return parseInt(currencyString.replace(/[^\d]/g, '')) || 0;
+        }
+
+        // Update display inputs when typing
+        if (minDisplayInput) {
+            minDisplayInput.addEventListener('input', function() {
+                const value = parseCurrency(this.value);
+                minInput.value = value;
+                if (minSlider) minSlider.value = value;
+                
+                // Reformat display
+                if (value > 0) {
+                    this.value = formatCurrency(value);
+                }
+            });
+
+            minDisplayInput.addEventListener('blur', function() {
+                const value = parseCurrency(this.value);
+                if (value > 0) {
+                    this.value = formatCurrency(value);
+                } else {
+                    this.value = '';
+                }
+            });
+        }
+
+        if (maxDisplayInput) {
+            maxDisplayInput.addEventListener('input', function() {
+                const value = parseCurrency(this.value);
+                maxInput.value = value;
+                if (maxSlider) maxSlider.value = value;
+                
+                // Reformat display
+                if (value > 0) {
+                    this.value = formatCurrency(value);
+                }
+            });
+
+            maxDisplayInput.addEventListener('blur', function() {
+                const value = parseCurrency(this.value);
+                if (value > 0) {
+                    this.value = formatCurrency(value);
+                } else {
+                    this.value = '';
+                }
+            });
+        }
+
+        if (minSlider && maxSlider) {
+            minSlider.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                minInput.value = value;
+                minDisplayInput.value = formatCurrency(value);
+                
+                if (value > parseInt(maxSlider.value)) {
+                    maxSlider.value = value;
+                    maxInput.value = value;
+                    maxDisplayInput.value = formatCurrency(value);
+                }
+            });
+
+            maxSlider.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                maxInput.value = value;
+                maxDisplayInput.value = formatCurrency(value);
+                
+                if (value < parseInt(minSlider.value)) {
+                    minSlider.value = value;
+                    minInput.value = value;
+                    minDisplayInput.value = formatCurrency(value);
+                }
+            });
+        }
+    </script>
+} 

@@ -1,0 +1,536 @@
+﻿@model CyberTech.Models.ProductDetailViewModel
+@{
+    ViewBag.Title = Model.Product.Name;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ProductDetail/styles.css">
+    <style>
+        .btn-wishlist.active {
+            color: red;
+            border-color: red;
+        }
+
+        /* Style cho nút thông báo */
+        .btn-notify-stock {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-notify-stock:not(.subscribed) {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #4CAF50;
+        }
+
+        .btn-notify-stock.subscribed {
+            background-color: #fff;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .btn-notify-stock:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-notify-stock:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-notify-stock .notify-icon {
+            font-size: 1.1em;
+        }
+
+        .btn-notify-stock .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-notify-stock:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .btn-notify-stock:active:after {
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+}
+
+@Html.AntiForgeryToken()
+
+<main class="product-container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Trang chủ </a> /&nbsp;
+        <a href="@Url.Action("Category", "Product", new { category = Model.Product.SubSubcategory.Subcategory.Category.Name.ToLower().Replace(" ", "-") })"> @Model.Product.SubSubcategory.Subcategory.Category.Name </a> /&nbsp;
+        <a href="@Url.Action("Subcategory", "Product", new { subcategory = Model.Product.SubSubcategory.Subcategory.Name.ToLower().Replace(" ", "-") })"> @Model.Product.SubSubcategory.Subcategory.Name </a> /&nbsp;
+        <span> @Model.Product.Name</span>
+    </div>
+
+    <div class="product-content">
+        <!-- Product Gallery -->
+        <div class="product-gallery">
+            <div class="gallery-main">
+                <button class="gallery-btn gallery-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="main-image">
+                    <img id="mainImage" src="@(Model.Product.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg?height=500&width=500")" alt="@Model.Product.Name">
+                </div>
+                <button class="gallery-btn gallery-next">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="thumbnail-container">
+                @foreach (var image in Model.Product.ProductImages)
+                {
+                    <div class="thumbnail @(image.IsPrimary ? "active" : "")" data-image="@image.ImageURL">
+                        <img src="@image.ImageURL" alt="@Model.Product.Name">
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+            <h1 class="product-title">@Model.Product.Name</h1>
+
+            <div class="product-rating">
+                <div class="stars">
+                    @{
+                        var avgRating = Model.Product.Reviews?.Any() == true ? Model.Product.Reviews.Average(r => r.Rating) : 0;
+
+                        var fullStars = (int)Math.Floor(avgRating);
+
+                        var hasHalfStar = avgRating - fullStars >= 0.5;
+                    }
+                    @for (int i = 0; i < fullStars; i++)
+                    {
+                        <i class="fas fa-star"></i>
+                    }
+                    @if (hasHalfStar)
+                    {
+                        <i class="fas fa-star-half-alt"></i>
+                    }
+                    @for (int i = 0; i < 5 - fullStars - (hasHalfStar ? 1 : 0); i++)
+                    {
+                        <i class="far fa-star"></i>
+                    }
+                </div>
+                <span class="rating-count">@(Model.Product.Reviews?.Count ?? 0) đánh giá</span>
+                <span class="view-reviews-link" onclick="scrollToReviews()">Xem đánh giá</span>
+            </div>
+
+            <div class="product-price">
+                @{
+                    var hasDiscount = Model.Product.SalePrice.HasValue && Model.Product.SalePrice.Value < Model.Product.Price;
+                }
+                @if (hasDiscount)
+                {
+                    <div class="original-price">@Model.Product.Price.ToString("N0")₫</div>
+                    <div class="current-price">@Model.Product.SalePrice.Value.ToString("N0")₫</div>
+                    <div class="discount-badge">-@(Math.Round((decimal)(Model.Product.Price - Model.Product.SalePrice.Value) / Model.Product.Price * 100))%</div>
+                }
+                else if (Model.Product.SalePercentage.HasValue && Model.Product.SalePercentage.Value > 0)
+                {
+                    var salePrice = Model.Product.Price * (1 - Model.Product.SalePercentage.Value / 100);
+                    <div class="original-price">@Model.Product.Price.ToString("N0")₫</div>
+                    <div class="current-price">@salePrice.ToString("N0")₫</div>
+                    <div class="discount-badge">-@Model.Product.SalePercentage.Value.ToString("0")%</div>
+                }
+                else
+                {
+                    <div class="current-price no-discount">@Model.Product.Price.ToString("N0")₫</div>
+                }
+            </div>
+
+            <div class="product-availability">
+                <i class="fas fa-check-circle"></i> @(Model.Product.Stock > 0 ? "Còn hàng" : "Hết hàng")
+            </div>
+
+            <div class="product-actions">
+                <div class="quantity-control">
+                    <button type="button" class="quantity-btn minus" data-action="decrease">-</button>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="@Model.Product.Stock" readonly>
+                    <button type="button" class="quantity-btn plus" data-action="increase">+</button>
+                </div>
+                @if (Model.Product.Stock > 0)
+                {
+                    <button class="btn-add-cart" data-product-id="@Model.Product.ProductID">
+                        <i class="fas fa-shopping-cart"></i> THÊM VÀO GIỎ
+                    </button>
+                }
+                else
+                {
+                    if (!User.Identity.IsAuthenticated)
+                    {
+                        <button class="btn-notify-stock" onclick="window.location.href='@Url.Action("Login", "Account", new { returnUrl = Context.Request.Path })'">
+                            <i class="fas fa-bell notify-icon"></i>
+                            <span class="notify-text">ĐĂNG NHẬP ĐỂ NHẬN THÔNG BÁO</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn-notify-stock @(Model.IsSubscribedToStock ? "subscribed" : "")" 
+                                data-product-id="@Model.Product.ProductID" 
+                                data-is-subscribed="@Model.IsSubscribedToStock">
+                            <i class="fas @(Model.IsSubscribedToStock ? "fa-bell-slash" : "fa-bell") notify-icon"></i>
+                            <span class="notify-text">
+                                @(Model.IsSubscribedToStock ? "HỦY NHẬN THÔNG BÁO" : "NHẬN THÔNG BÁO KHI CÓ HÀNG")
+                            </span>
+                        </button>
+                    }
+                }
+                <button class="btn-wishlist" data-product-id="@Model.Product.ProductID">
+                    <i class="@(Model.IsInWishlist ? "fas" : "far") fa-heart"></i>
+                </button>
+            </div>
+
+            <div class="product-delivery">
+                <div class="delivery-option">
+                    <i class="fas fa-truck"></i>
+                    <span>Giao hàng miễn phí</span>
+                </div>
+                <div class="delivery-option">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Đổi trả trong 7 ngày</span>
+                </div>
+            </div>
+
+            <div class="product-payment">
+                <h3>Phương thức thanh toán</h3>
+                <div class="payment-options">
+                    <span class="payment-option">Trả góp 0%</span>
+                    <span class="payment-option">Thanh toán khi nhận hàng</span>
+                    <span class="payment-option">Chuyển khoản</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Tabs -->
+    <div class="product-details">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="specifications">Thông số kỹ thuật</button>
+            <button class="tab-btn" data-tab="description">Mô tả sản phẩm</button>
+            <button class="tab-btn" data-tab="reviews">Đánh giá</button>
+        </div>
+
+        <div class="tab-content active" id="specifications">
+            <table class="specs-table">
+                @foreach (var attr in Model.Product.ProductAttributeValues)
+                {
+                    <tr>
+                        <td class="spec-name">@attr.AttributeValue.ProductAttribute.AttributeName</td>
+                        <td class="spec-value">@attr.AttributeValue.ValueName</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="tab-content" id="description">
+            <div class="product-description">
+                @Html.Raw(Model.Product.Description)
+            </div>
+        </div>
+
+        <div class="tab-content" id="reviews">
+            <div class="reviews-container">
+                <div class="review-summary">
+                    <div class="average-rating">
+                        <span class="rating-number">@avgRating.ToString("F1")</span>
+                        <div class="stars">
+                            @for (int i = 0; i < fullStars; i++)
+                            {
+                                <i class="fas fa-star"></i>
+                            }
+                            @if (hasHalfStar)
+                            {
+                                <i class="fas fa-star-half-alt"></i>
+                            }
+                            @for (int i = 0; i < 5 - fullStars - (hasHalfStar ? 1 : 0); i++)
+                            {
+                                <i class="far fa-star"></i>
+                            }
+                        </div>
+                        <span class="total-reviews">Dựa trên @(Model.Product.Reviews?.Count ?? 0) đánh giá</span>
+                    </div>
+                </div>
+
+                <div class="user-reviews">
+                    @if (Model.Product.Reviews?.Any() == true)
+                    {
+                        @foreach (var review in Model.Product.Reviews)
+                        {
+                            <div class="review-item">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar">
+                                        <img src="/placeholder.svg?height=50&width=50" alt="User Avatar">
+                                    </div>
+                                    <div class="reviewer-name-date">
+                                        <div class="reviewer-name">@review.User?.Name</div>
+                                        <div class="review-date">@review.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    @for (int i = 0; i < review.Rating; i++)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    @for (int i = 0; i < 5 - review.Rating; i++)
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                </div>
+                                <div class="review-content">
+                                    <p>@review.Comment</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-reviews">
+                            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+        <h2>Sản phẩm tương tự</h2>
+        <div class="related-slider-container">
+            <button class="slider-btn slider-prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="related-slider">
+                <div class="product-grid-slider">
+                    @foreach (var product in Model.RelatedProducts)
+                    {
+                        var productViewModel = new CyberTech.Models.ProductViewModel
+                        {
+                            ProductID = product.ProductID,
+                            Name = product.Name,
+                            Price = product.Price,
+                            SalePrice = product.SalePrice,
+                            SalePercentage = product.SalePercentage,
+                            DiscountedPrice = product.SalePrice,
+                            PrimaryImageUrl = product.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg?height=200&width=200",
+                            PrimaryImageUrlSmall = product.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg?height=200&width=200",
+                            Url = Url.Action("ProductDetail", "Product", new { id = product.ProductID }),
+                            Attributes = product.ProductAttributeValues.ToDictionary(
+                                pav => pav.AttributeValue.ProductAttribute.AttributeName,
+                                pav => pav.AttributeValue.ValueName
+                            ),
+                            AverageRating = product.Reviews?.Any() == true ? product.Reviews.Average(r => r.Rating) : 0,
+                            ReviewCount = product.Reviews?.Count ?? 0,
+                            Brand = product.Brand ?? "",
+                            Status = product.Status ?? "Active",
+                            SubSubcategory = product.SubSubcategory,
+                            IsInStock = product.Stock > 0
+                        };
+                        <div class="related-product-card">
+                            @Html.Partial("_ProductCard", productViewModel)
+                        </div>
+                    }
+                </div>
+            </div>
+            <button class="slider-btn slider-next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/ProductDetail/script.js"></script>
+    <script>
+        function scrollToReviews() {
+            document.querySelector('.tab-btn[data-tab="reviews"]').click();
+            document.getElementById('reviews').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        $(function() {
+            // Kiểm tra trạng thái wishlist và subscription khi load trang
+            var isInWishlist = '@Model.IsInWishlist.ToString()' === 'True';
+            var isSubscribedToStock = '@Model.IsSubscribedToStock.ToString()' === 'True';
+
+            // Cập nhật trạng thái wishlist
+            if (isInWishlist) {
+                $('.btn-wishlist').addClass('active');
+                $('.btn-wishlist i').removeClass('far').addClass('fas');
+            }
+
+            // Cập nhật trạng thái subscription
+            if (isSubscribedToStock) {
+                const button = $('.btn-notify-stock');
+                button.addClass('subscribed');
+                button.find('.notify-icon').removeClass('fa-bell').addClass('fa-bell-slash');
+                button.find('.notify-text').text('HỦY NHẬN THÔNG BÁO');
+            }
+
+            // Toggle wishlist
+            $('.btn-wishlist').on('click', function() {
+                var button = $(this);
+                var icon = button.find('i');
+                var productId = button.data('product-id');
+                console.log("productId", productId);                
+                $.ajax({
+                    url: '/Account/ToggleWishlist',
+                    type: 'POST',
+                    data: { productId: productId },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (icon.hasClass('far')) {
+                                icon.removeClass('far').addClass('fas');
+                                button.addClass('active');
+                                utils.showToast('Đã thêm vào danh sách yêu thích', 'success');
+                            } else {
+                                icon.removeClass('fas').addClass('far');
+                                button.removeClass('active');
+                                utils.showToast('Đã xóa khỏi danh sách yêu thích', 'success');
+                            }
+                        } else {
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    },
+                    error: function() {
+                        utils.showToast('Có lỗi xảy ra', 'error');
+                    }
+                });
+            });
+
+            // Add to cart functionality
+            $('.btn-add-cart').on('click', function() {
+                var button = $(this);
+                if (button.prop('disabled')) return;
+
+                var productId = button.data('product-id');
+                var quantity = parseInt($('#quantity').val());
+
+                // Hiệu ứng loading
+                var originalText = button.html();
+                button.html('<i class="fas fa-spinner fa-spin"></i> Đang thêm...').prop('disabled', true);
+
+                $.ajax({
+                    url: '/Cart/AddToCart',
+                    type: 'POST',
+                    data: { productId: productId, quantity: quantity },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update cart count badge
+                            if (response.cartCount !== undefined) {
+                                window.updateCartCount(response.cartCount);
+                            }
+
+                            // Hiệu ứng thành công
+                            button.html('<i class="fas fa-check"></i> Đã thêm').addClass('success');
+
+                            setTimeout(function() {
+                                button.html(originalText).removeClass('success').prop('disabled', false);
+                            }, 2000);
+
+                            utils.showToast('Đã thêm vào giỏ hàng', 'success');
+                        } else {
+                            button.html(originalText).prop('disabled', false);
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    },
+                    error: function() {
+                        button.html(originalText).prop('disabled', false);
+                        utils.showToast('Có lỗi xảy ra', 'error');
+                    }
+                });
+            });
+
+            // Stock notification functionality
+            $('.btn-notify-stock').on('click', function() {
+                if (!@User.Identity.IsAuthenticated.ToString().ToLower()) {
+                    window.location.href = '@Url.Action("Login", "Account", new { returnUrl = Context.Request.Path })';
+                    return;
+                }
+
+                var button = $(this);
+                var isSubscribed = button.hasClass('subscribed');
+                var productId = button.data('product-id');
+
+                // Hiệu ứng loading
+                var icon = button.find('.notify-icon');
+                var text = button.find('.notify-text');
+                var originalIcon = isSubscribed ? 'fa-bell-slash' : 'fa-bell';
+                
+                button.prop('disabled', true);
+                icon.removeClass(originalIcon).addClass('fa-spinner fa-spin');
+                text.text('ĐANG XỬ LÝ...');
+
+                $.ajax({
+                    url: '/Product/ToggleStockNotification',
+                    type: 'POST',
+                    data: { productId: productId },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (isSubscribed) {
+                                button.removeClass('subscribed');
+                                icon.removeClass('fa-spinner fa-spin').addClass('fa-bell');
+                                text.text('NHẬN THÔNG BÁO KHI CÓ HÀNG');
+                                utils.showToast('Đã hủy đăng ký nhận thông báo', 'success');
+                            } else {
+                                button.addClass('subscribed');
+                                icon.removeClass('fa-spinner fa-spin').addClass('fa-bell-slash');
+                                text.text('HỦY NHẬN THÔNG BÁO');
+                                utils.showToast('Đã đăng ký nhận thông báo khi có hàng', 'success');
+                            }
+                        } else {
+                            icon.removeClass('fa-spinner fa-spin').addClass(originalIcon);
+                            text.text(isSubscribed ? 'HỦY NHẬN THÔNG BÁO' : 'NHẬN THÔNG BÁO KHI CÓ HÀNG');
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    },
+                    error: function() {
+                        icon.removeClass('fa-spinner fa-spin').addClass(originalIcon);
+                        text.text(isSubscribed ? 'HỦY NHẬN THÔNG BÁO' : 'NHẬN THÔNG BÁO KHI CÓ HÀNG');
+                        utils.showToast('Có lỗi xảy ra', 'error');
+                    },
+                    complete: function() {
+                        button.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

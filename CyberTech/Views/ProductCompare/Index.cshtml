@@ -1,0 +1,1313 @@
+@model CyberTech.Models.ProductCompareViewModel
+@{
+    ViewBag.Title = "So sánh sản phẩm";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ProductCompare/styles.css">
+    <style>
+        .compare-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .compare-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .compare-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .compare-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .empty-compare {
+            text-align: center;
+            padding: 80px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin: 40px 0;
+        }
+
+        .empty-compare i {
+            font-size: 5rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-compare h3 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .empty-compare p {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        .btn-browse-products {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-browse-products:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .compare-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+
+        .compare-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            text-align: left;
+            width: 200px;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+
+        .compare-table td {
+            text-align: center;
+            position: relative;
+        }
+
+        .product-header {
+            padding: 20px 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid #007bff;
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .product-price {
+            color: #007bff;
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-remove-product {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-product:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #000000;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            text-shadow: none;
+            border-left: 4px solid #3498db;
+            border: 1px solid #dee2e6;
+        }
+
+        .spec-value {
+            font-weight: 500;
+            color: #333;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .spec-value.best {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #28a745;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .spec-value.worst {
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        .spec-value.equal {
+            color: #495057;
+            background: #f8f9fa;
+            font-weight: 500;
+        }
+
+        .spec-value.highlight {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #1976d2;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Category Score Styling */
+        .category-score {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .category-score.excellent {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+        }
+
+        .category-score.good {
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+            color: white;
+            box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+        }
+
+        .category-score.average {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #000;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
+        .category-score.poor {
+            background: linear-gradient(135deg, #dc3545, #6c757d);
+            color: white;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+        }
+
+        /* AI Chat Box Styles */
+        .ai-chat-container {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #007bff;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.1);
+        }
+
+        .ai-chat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #007bff;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .chat-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .chat-chip {
+            background: #e9ecef;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .chat-chip:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .chat-response {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .chat-response.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .chat-loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #6c757d;
+        }
+
+        .chat-loading.show {
+            display: block;
+        }
+
+        .radar-chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .radar-chart-container h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #radarChart {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 900px;
+            max-height: 600px;
+        }
+
+        .ai-analysis {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #28a745;
+        }
+
+        .ai-analysis h3 {
+            color: #155724;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        .recommended-product {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .recommended-product img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .recommended-info h4 {
+            color: #155724;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .recommended-info p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .analysis-reasons {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .analysis-reasons li {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .suggested-products {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .suggested-products h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .suggested-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .suggested-item {
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .suggested-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+        }
+
+        .suggested-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .suggested-item h5 {
+            color: #333;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .suggested-item .price {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .floating-compare-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,123,255,0.4);
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .floating-compare-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0,123,255,0.5);
+        }
+
+        .floating-compare-widget .count {
+            background: white;
+            color: #007bff;
+            padding: 2px 8px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        @@media (max-width: 768px) {
+            .compare-table-container {
+                overflow-x: auto;
+            }
+            
+            .compare-table {
+                min-width: 800px;
+            }
+            
+            .recommended-product {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .suggested-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+}
+
+@Html.AntiForgeryToken()
+
+<div class="compare-container" id="compareProductsContainer">
+    <div class="compare-header">
+        <h1><i class="fas fa-balance-scale"></i> So sánh sản phẩm</h1>
+        <p>So sánh chi tiết các sản phẩm để đưa ra quyết định mua hàng tốt nhất</p>
+    </div>
+
+    @if (!Model.Products.Any())
+    {
+        <div class="empty-compare">
+            <i class="fas fa-balance-scale"></i>
+            <h3>Chưa có sản phẩm nào để so sánh</h3>
+            <p>Hãy thêm sản phẩm vào danh sách so sánh từ trang chi tiết sản phẩm hoặc danh sách sản phẩm</p>
+            <a href="@Url.Action("Index", "Home")" class="btn-browse-products">
+                <i class="fas fa-shopping-bag"></i>
+                Khám phá sản phẩm
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- AI Chat Assistant -->
+        <div class="ai-chat-container">
+            <div class="ai-chat-header">
+                <i class="fas fa-robot"></i>
+                <span>AI Tư vấn chọn sản phẩm</span>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" 
+                       placeholder="Nhập nhu cầu của bạn (VD: laptop học online, pin lâu, nhẹ, dưới 15 triệu)">
+                <button class="chat-send-btn" id="chatSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            
+            <div class="chat-chips">
+                <span class="chat-chip" data-chip="🎮 Chơi game">🎮 Chơi game</span>
+                <span class="chat-chip" data-chip="💼 Làm việc văn phòng">💼 Làm việc văn phòng</span>
+                <span class="chat-chip" data-chip="✈️ Gọn nhẹ mang đi">✈️ Gọn nhẹ mang đi</span>
+                <span class="chat-chip" data-chip="💰 Giá rẻ tối ưu">💰 Giá rẻ tối ưu</span>
+                <span class="chat-chip" data-chip="🎨 Thiết kế đồ họa">🎨 Thiết kế đồ họa</span>
+                <span class="chat-chip" data-chip="📚 Học tập online">📚 Học tập online</span>
+            </div>
+            
+            <div class="chat-loading" id="chatLoading">
+                <i class="fas fa-spinner fa-spin"></i> AI đang phân tích...
+            </div>
+            
+            <div class="chat-response" id="chatResponse">
+                <!-- AI response will be populated here -->
+            </div>
+        </div>
+
+        <!-- Bảng so sánh sản phẩm -->
+        <div class="compare-table-container">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        @foreach (var product in Model.Products)
+                        {
+                            <td class="product-header">
+                                <img src="@(product.ProductImages.FirstOrDefault(pi => pi.IsPrimary)?.ImageURL ?? product.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg")" 
+                                     alt="@product.Name" class="product-image">
+                                <div class="product-name">@product.Name</div>
+                                <div class="product-price">@product.GetEffectivePrice().ToString("N0")₫</div>
+                                <button class="btn-remove-product" data-product-id="@product.ProductID">
+                                    <i class="fas fa-times"></i> Xóa
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Hiển thị technical specs với highlighting -->
+                    @if (Model.TechnicalSpecs.Any())
+                    {
+                        @foreach (var category in Model.TechnicalSpecs)
+                        {
+                            <tr>
+                                <th class="category-header" colspan="@(Model.Products.Count + 1)">@category.Key</th>
+                            </tr>
+                            @foreach (var spec in category.Value)
+                            {
+                                <tr>
+                                    <th>@spec.DisplayName @if (!string.IsNullOrEmpty(spec.Unit)) { <span>(@spec.Unit)</span> }</th>
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        var specValue = spec.Values.FirstOrDefault(v => v.ProductId == product.ProductID);
+                                        var displayValue = specValue?.RawValue ?? "N/A";
+                                        var highlightClass = specValue?.HighlightClass ?? "equal";
+                                        <td class="spec-value @highlightClass">@displayValue</td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    }
+
+                    <!-- Thông số cơ bản -->
+                    <tr>
+                        <th class="category-header" colspan="@(Model.Products.Count + 1)">Thông tin cơ bản</th>
+                    </tr>
+                    <tr>
+                        <th>Thương hiệu</th>
+                        @foreach (var product in Model.Products)
+                        {
+                            <td class="spec-value">@(product.Brand ?? "N/A")</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Đánh giá</th>
+                        @foreach (var product in Model.Products)
+                        {
+                            var avgRating = product.Reviews?.Any() == true ? product.Reviews.Average(r => r.Rating) : 0;
+                            <td class="spec-value">
+                                @if (avgRating > 0)
+                                {
+                                    <span>@avgRating.ToString("F1")/5 ⭐ (@product.Reviews.Count đánh giá)</span>
+                                }
+                                else
+                                {
+                                    <span>Chưa có đánh giá</span>
+                                }
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Tình trạng</th>
+                        @foreach (var product in Model.Products)
+                        {
+                            <td class="spec-value">
+                                @if (product.Stock > 0)
+                                {
+                                    <span style="color: #28a745;">✅ Còn hàng (@product.Stock)</span>
+                                }
+                                else
+                                {
+                                    <span style="color: #dc3545;">❌ Hết hàng</span>
+                                }
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Biểu đồ Radar -->
+        <div class="radar-chart-container">
+            <h3><i class="fas fa-chart-radar"></i> Biểu đồ so sánh tổng quan</h3>
+            <div class="chart-wrapper">
+                <canvas id="radarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Phân tích AI -->
+        @if (Model.Analysis != null)
+        {
+            <div class="ai-analysis">
+                <h3><i class="fas fa-robot"></i> Phân tích AI & Gợi ý</h3>
+                
+                <div class="recommended-product">
+                    <img src="@Model.Analysis.RecommendedProductImage" alt="@Model.Analysis.RecommendedProductName">
+                    <div class="recommended-info">
+                        <h4>🏆 Sản phẩm được đề xuất: @Model.Analysis.RecommendedProductName</h4>
+                        <p>Điểm tổng: @Model.Analysis.OverallScores[Model.Analysis.RecommendedProductName]/10</p>
+                    </div>
+                </div>
+
+                <ul class="analysis-reasons">
+                    @foreach (var reason in Model.Analysis.Reasons)
+                    {
+                        <li>@reason</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Sản phẩm gợi ý -->
+        @if (Model.SuggestedProducts.Any())
+        {
+            <div class="suggested-products">
+                <h3><i class="fas fa-lightbulb"></i> Sản phẩm khác cùng loại</h3>
+                <div class="suggested-grid">
+                    @foreach (var product in Model.SuggestedProducts)
+                    {
+                        <div class="suggested-item" data-product-id="@product.ProductID">
+                            <img src="@(product.ProductImages.FirstOrDefault(pi => pi.IsPrimary)?.ImageURL ?? product.ProductImages.FirstOrDefault()?.ImageURL ?? "/placeholder.svg")" 
+                                 alt="@product.Name">
+                            <h5>@product.Name</h5>
+                            <div class="price">@product.GetEffectivePrice().ToString("N0")₫</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize radar chart once if products exist and canvas is present
+            @if (Model.Products.Any())
+            {
+                <text>
+                // Wait for DOM to be fully ready, then initialize chart once
+                setTimeout(function() {
+                    if (document.getElementById('radarChart') && !radarChartInstance) {
+                        initializeRadarChart();
+                    }
+                }, 100);
+                </text>
+            }
+
+            // Remove product from compare
+            $('.btn-remove-product').on('click', function() {
+                const productId = $(this).data('product-id');
+                removeFromCompare(productId);
+            });
+
+            // Add suggested product to compare
+            $('.suggested-item').on('click', function() {
+                const productId = $(this).data('product-id');
+                addToCompare(productId);
+            });
+
+            // Floating widget click
+            $('#floatingCompareWidget').on('click', function() {
+                window.location.href = '@Url.Action("Index", "ProductCompare")';
+            });
+
+            // Update compare count
+            updateCompareCount();
+
+            // AI Chat functionality
+            $('#chatSendBtn').on('click', function() {
+                handleChatSubmit();
+            });
+
+            $('#chatInput').on('keypress', function(e) {
+                if (e.which === 13) {
+                    handleChatSubmit();
+                }
+            });
+
+            $('.chat-chip').on('click', function() {
+                const chipText = $(this).data('chip');
+                $('#chatInput').val(chipText);
+                handleChatSubmit();
+            });
+        });
+
+        function handleChatSubmit() {
+            const input = $('#chatInput');
+            const query = input.val().trim();
+            
+            if (query === '') return;
+            
+            // Show loading
+            $('#chatLoading').addClass('show');
+            $('#chatResponse').removeClass('show');
+            
+            // Clear input
+            input.val('');
+            
+            // Call API
+            $.ajax({
+                url: '@Url.Action("ProcessAIChat", "ProductCompare")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ Query: query }),
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    displayChatResponse(response);
+                    $('#chatLoading').removeClass('show');
+                },
+                error: function() {
+                    const errorResponse = {
+                        type: 'error',
+                        message: 'Có lỗi xảy ra khi xử lý yêu cầu. Vui lòng thử lại.',
+                        recommendation: null
+                    };
+                    displayChatResponse(errorResponse);
+                    $('#chatLoading').removeClass('show');
+                                 }
+             });
+         }
+
+        // Global chart instance
+        let radarChartInstance = null;
+
+        function initializeRadarChart() {
+            try {
+                const canvas = document.getElementById('radarChart');
+                if (!canvas) {
+                    console.log('Radar chart canvas not found');
+                    return;
+                }
+
+                // Destroy existing chart if exists
+                if (radarChartInstance) {
+                    radarChartInstance.destroy();
+                    radarChartInstance = null;
+                }
+
+                // Clear canvas attributes to prevent size conflicts
+                canvas.removeAttribute('width');
+                canvas.removeAttribute('height');
+                canvas.style.width = '';
+                canvas.style.height = '';
+
+                const ctx = canvas.getContext('2d');
+                
+                const products = @Html.Raw(Json.Serialize(Model.Products.Select(p => new { 
+                    name = p.Name, 
+                    id = p.ProductID 
+                })));
+                
+                const overallScores = @Html.Raw(Json.Serialize(Model.Analysis?.OverallScores ?? new Dictionary<string, decimal>()));
+                
+                const criteriaLabels = @Html.Raw(Json.Serialize(Model.CriteriaByCategory.SelectMany(c => c.Value).Select(cr => cr.DisplayName).Take(6)));
+                
+                if (!criteriaLabels || criteriaLabels.length === 0) {
+                    console.log('No criteria labels found');
+                    return;
+                }
+                
+                const colors = [
+                    { bg: 'rgba(54, 162, 235, 0.3)', border: 'rgba(54, 162, 235, 1)' },
+                    { bg: 'rgba(255, 99, 132, 0.3)', border: 'rgba(255, 99, 132, 1)' },
+                    { bg: 'rgba(75, 192, 192, 0.3)', border: 'rgba(75, 192, 192, 1)' },
+                    { bg: 'rgba(255, 206, 86, 0.3)', border: 'rgba(255, 206, 86, 1)' }
+                ];
+                
+                // Generate static data based on product ID to avoid random changes
+                const datasets = products.map((product, index) => {
+                    const color = colors[index % colors.length];
+                    const productScore = overallScores[product.name] || 7; // Default score if not found
+                    
+                    // Generate consistent scores based on product ID (not random)
+                    const seed = product.id; // Use product ID as seed for consistency
+                    const data = criteriaLabels.map((label, criteriaIndex) => {
+                        // Create pseudo-random but consistent score based on product ID and criteria index
+                        const pseudoRandom = ((seed * 9301 + criteriaIndex * 49297) % 233280) / 233280;
+                        const variance = 1.5; // Reduced variance for more realistic scores
+                        const score = Math.max(1, Math.min(10, productScore + (pseudoRandom - 0.5) * variance));
+                        return Math.round(score * 10) / 10; // Round to 1 decimal
+                    });
+                    
+                    return {
+                        label: product.name,
+                        data: data,
+                        backgroundColor: color.bg,
+                        borderColor: color.border,
+                        borderWidth: 2,
+                        pointBackgroundColor: color.border,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    };
+                });
+
+                radarChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: criteriaLabels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        resizeDelay: 0,
+                        animation: {
+                            duration: 800,
+                            easing: 'easeInOutQuart'
+                        },
+                        layout: {
+                            padding: {
+                                top: 20,
+                                bottom: 20,
+                                left: 20,
+                                right: 20
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 2,
+                                    color: '#666',
+                                    backdropColor: 'transparent'
+                                },
+                                grid: {
+                                    color: '#e0e0e0'
+                                },
+                                angleLines: {
+                                    color: '#e0e0e0'
+                                },
+                                pointLabels: {
+                                    color: '#333',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                align: 'center',
+                                labels: {
+                                    padding: 15,
+                                    usePointStyle: true,
+                                    color: '#333',
+                                    font: {
+                                        size: 11,
+                                        weight: '600'
+                                    },
+                                    boxWidth: 8,
+                                    boxHeight: 8
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.r + '/10';
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false
+                        }
+                    }
+                });
+
+                console.log('Radar chart initialized successfully');
+            } catch (error) {
+                console.error('Error initializing radar chart:', error);
+            }
+        }
+
+        function addToCompare(productId) {
+            $.ajax({
+                url: '@Url.Action("AddToCompare", "ProductCompare")',
+                type: 'POST',
+                data: { productId: productId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (window.utils) utils.showToast(response.message, 'success');
+                        updateCompareCount();
+                        // Only reload if not already on compare page to avoid infinite loop
+                        if (window.location.pathname.includes('ProductCompare') && 
+                            !document.getElementById('compareProductsContainer')) {
+                            setTimeout(() => window.location.reload(), 1000);
+                        }
+                    } else {
+                        if (window.utils) utils.showToast(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    if (window.utils) utils.showToast('Có lỗi xảy ra', 'error');
+                }
+            });
+        }
+
+        function removeFromCompare(productId) {
+            $.ajax({
+                url: '@Url.Action("RemoveFromCompare", "ProductCompare")',
+                type: 'POST',
+                data: { productId: productId },
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (window.utils) utils.showToast(response.message, 'success');
+                        updateCompareCount();
+                        // Reload page after removing product
+                        setTimeout(() => window.location.reload(), 800);
+                    } else {
+                        if (window.utils) utils.showToast(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    if (window.utils) utils.showToast('Có lỗi xảy ra', 'error');
+                }
+            });
+        }
+
+        function updateCompareCount() {
+            $.ajax({
+                url: '@Url.Action("GetCompareProducts", "ProductCompare")',
+                type: 'GET',
+                success: function(response) {
+                    const count = response.count || 0;
+                    $('#compareCount').text(count);
+                    
+                    if (count > 0) {
+                        $('#floatingCompareWidget').show();
+                    } else {
+                        $('#floatingCompareWidget').hide();
+                    }
+                }
+            });
+        }
+
+        // Helper function to update compare widget globally
+        window.updateCompareWidget = updateCompareCount;
+
+        // Cleanup chart on page unload and visibility change
+        $(window).on('beforeunload', function() {
+            destroyChart();
+        });
+
+        // Also cleanup when page becomes hidden
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && radarChartInstance) {
+                console.log('Page hidden, preserving chart');
+            }
+        });
+
+        function destroyChart() {
+            if (radarChartInstance) {
+                try {
+                    radarChartInstance.destroy();
+                    radarChartInstance = null;
+                    console.log('Chart destroyed successfully');
+                } catch (error) {
+                    console.error('Error destroying chart:', error);
+                }
+            }
+        }
+
+        function processAIQuery(query) {
+            const products = @Html.Raw(Json.Serialize(Model.Products.Select(p => new { 
+                name = p.Name, 
+                id = p.ProductID,
+                price = p.GetEffectivePrice(),
+                brand = p.Brand
+            })));
+            
+            const queryLower = query.toLowerCase();
+            
+            // Validate query feasibility
+            if (queryLower.includes('dưới 5 triệu') && queryLower.includes('chơi game')) {
+                return {
+                    type: 'warning',
+                    message: '⚠️ Yêu cầu của bạn hiện không khả thi. Gaming laptop với ngân sách dưới 5 triệu sẽ không đáp ứng được hiệu năng cần thiết. Bạn vui lòng điều chỉnh lại ngân sách lên tối thiểu 15-20 triệu.',
+                    recommendation: null
+                };
+            }
+            
+            if (queryLower.includes('dưới 1kg') && queryLower.includes('chơi game')) {
+                return {
+                    type: 'warning',
+                    message: '⚠️ Yêu cầu không hợp lý. Laptop gaming với trọng lượng dưới 1kg hiện không tồn tại do yêu cầu phần cứng mạnh. Laptop gaming thường nặng từ 2-3kg.',
+                    recommendation: null
+                };
+            }
+            
+            // Extract budget
+            let budget = 0;
+            const budgetMatch = query.match(/(\d+)\s*(triệu|tr)/i);
+            if (budgetMatch) {
+                budget = parseInt(budgetMatch[1]) * 1000000;
+            }
+            
+            // Score products based on query
+            let scoredProducts = products.map(product => {
+                let score = 5; // Base score
+                let reasons = [];
+                
+                // Budget matching
+                if (budget > 0) {
+                    if (product.price <= budget) {
+                        score += 3;
+                        reasons.push(`Trong ngân sách ${budgetMatch[0]}`);
+                    } else {
+                        score -= 2;
+                    }
+                }
+                
+                // Use case matching
+                if (queryLower.includes('chơi game') || queryLower.includes('gaming')) {
+                    if (product.name.toLowerCase().includes('gaming') || 
+                        product.name.toLowerCase().includes('rog') ||
+                        product.name.toLowerCase().includes('legion')) {
+                        score += 4;
+                        reasons.push('Thiết kế cho gaming');
+                    }
+                } else if (queryLower.includes('học') || queryLower.includes('văn phòng')) {
+                    if (product.name.toLowerCase().includes('business') ||
+                        product.name.toLowerCase().includes('thinkpad') ||
+                        product.name.toLowerCase().includes('inspiron')) {
+                        score += 3;
+                        reasons.push('Phù hợp học tập/văn phòng');
+                    }
+                } else if (queryLower.includes('nhẹ') || queryLower.includes('mang đi')) {
+                    if (product.name.toLowerCase().includes('ultrabook') ||
+                        product.name.toLowerCase().includes('slim') ||
+                        product.name.toLowerCase().includes('air')) {
+                        score += 3;
+                        reasons.push('Thiết kế mỏng nhẹ');
+                    }
+                }
+                
+                // Brand preference
+                if (queryLower.includes('apple') && product.brand === 'Apple') score += 2;
+                if (queryLower.includes('dell') && product.brand === 'Dell') score += 2;
+                if (queryLower.includes('hp') && product.brand === 'HP') score += 2;
+                
+                return { ...product, score, reasons };
+            });
+            
+            // Sort by score
+            scoredProducts = scoredProducts.sort((a, b) => b.score - a.score);
+            const bestProduct = scoredProducts[0];
+            
+            if (bestProduct.score < 6) {
+                return {
+                    type: 'info',
+                    message: '🤔 Không tìm thấy sản phẩm hoàn toàn phù hợp với yêu cầu của bạn. Dưới đây là gợi ý gần nhất:',
+                    recommendation: bestProduct
+                };
+            }
+            
+            return {
+                type: 'success',
+                message: '✅ Dựa trên yêu cầu của bạn, đây là sản phẩm tối ưu nhất:',
+                recommendation: bestProduct
+            };
+        }
+
+        function displayChatResponse(response) {
+            const responseDiv = $('#chatResponse');
+            let html = `<div style="margin-bottom: 15px; font-weight: 600; color: #333;">${response.message}</div>`;
+            
+            if (response.recommendation) {
+                const product = response.recommendation;
+                html += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
+                        <h5 style="color: #007bff; margin-bottom: 10px;">🏆 ${product.name}</h5>
+                        <p style="margin-bottom: 8px;"><strong>Giá:</strong> ${product.price.toLocaleString()}₫</p>
+                        <p style="margin-bottom: 8px;"><strong>Thương hiệu:</strong> ${product.brand}</p>
+                        <p style="margin-bottom: 8px;"><strong>Điểm phù hợp:</strong> ${product.score}/10</p>
+                        ${product.reasons.length > 0 ? `
+                            <div style="margin-top: 10px;">
+                                <strong>Lý do phù hợp:</strong>
+                                <ul style="margin: 5px 0; padding-left: 20px;">
+                                    ${product.reasons.map(reason => `<li>${reason}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            responseDiv.html(html).addClass('show');
+        }
+    </script>
+}
+
+@functions {
+    private Dictionary<string, object> GetProductSpecifications(Product product)
+    {
+        var specs = new Dictionary<string, object>();
+        
+        // Add basic product info
+        specs["price"] = product.GetEffectivePrice();
+        specs["brand"] = product.Brand ?? "";
+        specs["rating"] = product.Reviews?.Any() == true ? product.Reviews.Average(r => r.Rating) : 0;
+
+        // Add product attributes
+        foreach (var attr in product.ProductAttributeValues)
+        {
+            var attrName = attr.AttributeValue.ProductAttribute.AttributeName.ToLower().Replace(" ", "_");
+            specs[attrName] = attr.AttributeValue.ValueName;
+        }
+
+        return specs;
+    }
+    
+    private decimal ExtractNumericValueFromString(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return 0;
+        
+        // Remove common units and extract numbers
+        var cleanInput = input.ToLower()
+            .Replace("gb", "").Replace("tb", "").Replace("hz", "")
+            .Replace("dpi", "").Replace("ms", "").Replace("g", "")
+            .Replace("ω", "").Replace("h", "").Replace(",", "")
+            .Replace("mah", "").Replace("inch", "").Replace("\"", "")
+            .Trim();
+        
+        // Handle TB to GB conversion
+        if (input.ToLower().Contains("tb"))
+        {
+            if (decimal.TryParse(cleanInput, out decimal tbValue))
+                return tbValue * 1024; // Convert TB to GB
+        }
+        
+        // Handle KHz to Hz conversion
+        if (input.ToLower().Contains("khz"))
+        {
+            if (decimal.TryParse(cleanInput, out decimal khzValue))
+                return khzValue * 1000; // Convert KHz to Hz
+        }
+        
+        // Extract first number found
+        var match = System.Text.RegularExpressions.Regex.Match(cleanInput, @"[\d\.]+");
+        if (match.Success && decimal.TryParse(match.Value, out decimal result))
+            return result;
+        
+        return 0;
+    }
+    
+    private bool IsHigherBetter(string criteriaName)
+    {
+        var name = criteriaName.ToLower();
+        
+        // Higher is better for these criteria
+        var higherIsBetterList = new[] {
+            "ram", "storage", "vram", "cpu_score", "gpu_score", "dpi", "polling_rate",
+            "frequency_response", "rating", "battery_life", "screen_size", "resolution",
+            "cores", "threads", "speed", "refresh_rate", "durability", "warranty"
+        };
+        
+        // Lower is better for these criteria  
+        var lowerIsBetterList = new[] {
+            "price", "weight", "response_time", "latency", "thickness"
+        };
+        
+        if (higherIsBetterList.Any(x => name.Contains(x))) return true;
+        if (lowerIsBetterList.Any(x => name.Contains(x))) return false;
+        
+        return true; // Default to higher is better
+    }
+    
+    private string GetSpecValueCssClass(decimal value, decimal minValue, decimal maxValue, bool higherIsBetter, string originalValue)
+    {
+        if (originalValue == "N/A" || value == 0) return "equal";
+        if (minValue == maxValue) return "equal";
+        
+        bool isBest = higherIsBetter ? (value == maxValue) : (value == minValue);
+        bool isWorst = higherIsBetter ? (value == minValue) : (value == maxValue);
+        
+        if (isBest) return "best";
+        if (isWorst) return "worst";
+        
+        return "equal";
+    }
+} 

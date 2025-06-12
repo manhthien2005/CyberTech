@@ -1,0 +1,1342 @@
+@model CyberTech.ViewModels.CartViewModel
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Sử dụng các giá trị từ Model thay vì tính toán lại
+    decimal subtotal = Model.Subtotal;
+    decimal productDiscountAmount = Model.ProductDiscountAmount;
+    decimal rankDiscountAmount = Model.RankDiscountAmount;
+    decimal voucherDiscountAmount = Model.VoucherDiscountAmount;
+    decimal totalDiscountAmount = Model.TotalDiscount;
+    decimal finalTotal = Model.FinalTotal;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="page-title mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Giỏ hàng của bạn
+                </h2>
+                @if (Model.CartItems?.Any() == true)
+                {
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="clearCart">
+                        <i class="fas fa-trash-alt me-1"></i>Xóa tất cả
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.CartItems?.Any() == true)
+    {
+        <div class="row">
+            <!-- Cart Items Section -->
+            <div class="col-lg-8 col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Sản phẩm trong giỏ
+                            <span class="badge bg-secondary ms-2">@Model.CartItems.Count</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            var imageUrl = item.Product?.ProductImages?.FirstOrDefault(pi => pi.IsPrimary)?.ImageURL ?? "/images/no-image.png";
+                            var originalPrice = item.Product?.Price ?? 0;
+                            var effectivePrice = item.Product?.GetEffectivePrice() ?? originalPrice;
+                            var isOnSale = item.Product?.IsOnSale ?? false;
+                            
+                            <div class="cart-item border-bottom p-3" data-cart-item-id="@item.CartItemID">
+                                <div class="row align-items-center">
+                                    <!-- Product Image -->
+                                    <div class="col-md-2 col-3">
+                                        <img src="@imageUrl" alt="@item.Product?.Name" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                                    </div>
+                                    
+                                    <!-- Product Info -->
+                                    <div class="col-md-4 col-9">
+                                        <h6 class="mb-1">@(item.Product?.Name ?? "Sản phẩm")</h6>
+                                        <div class="price-info">
+                                            @if (isOnSale)
+                                            {
+                                                <span class="text-decoration-line-through text-muted me-2">@originalPrice.ToString("N0") đ</span>
+                                                <span class="text-danger fw-bold">@effectivePrice.ToString("N0") đ</span>
+                                                @if (item.Product?.SalePercentage.HasValue == true)
+                                                {
+                                                    <span class="badge bg-danger ms-1">-@item.Product.SalePercentage.Value%</span>
+                                                }
+                                                else
+                                                {
+                                                    var discountPercent = Math.Round((1 - (effectivePrice / originalPrice)) * 100, 0);
+                                                    <span class="badge bg-danger ms-1">-@discountPercent%</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="fw-bold">@originalPrice.ToString("N0") đ</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-box me-1"></i>Còn @(item.Product?.Stock ?? 0) sản phẩm
+                                        </small>
+                                    </div>
+                                    
+                                    <!-- Quantity Controls -->
+                                    <div class="col-md-3 col-6 mt-2 mt-md-0">
+                                        <label class="form-label small">Số lượng</label>
+                                        <div class="quantity-control">
+                                            <div class="input-group">
+                                                <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="decrease">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" class="form-control quantity-input" 
+                                                       value="@item.Quantity" min="1" max="@(item.Product?.Stock ?? 999)" 
+                                                       data-cart-item-id="@item.CartItemID">
+                                                <button type="button" class="btn btn-outline-secondary quantity-btn" data-action="increase">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Subtotal & Actions -->
+                                    <div class="col-md-3 col-6 mt-2 mt-md-0 text-end">
+                                        <div class="fw-bold text-primary mb-2 subtotal-amount">
+                                            @item.Subtotal.ToString("N0") đ
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-cart-item" 
+                                                data-cart-item-id="@item.CartItemID" title="Xóa sản phẩm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary Sidebar -->
+            <div class="col-lg-4 col-md-12">
+                <div class="cart-summary-sticky">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calculator me-2"></i>Tóm tắt đơn hàng
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Voucher Section -->
+                            <div class="mb-3">
+                                <h6 class="mb-2"><i class="fas fa-ticket-alt me-2"></i>Mã giảm giá</h6>
+                                <form id="applyVoucherForm">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" id="voucherCode" name="voucherCode" 
+                                               placeholder="Nhập mã giảm giá..." value="@ViewBag.AppliedVoucherCode">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                <div id="voucherMessage" class="mt-2">
+                                    @if (Model.AppliedVoucher != null)
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center alert alert-success py-2 mb-0">
+                                            <div>
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                <span>Đã áp dụng: <strong>@Model.AppliedVoucher.Code</strong></span>
+                                                @if (Model.AppliedVoucher.DiscountType == "PERCENT")
+                                                {
+                                                    <span class="badge bg-success ms-1">-@Model.AppliedVoucher.DiscountValue%</span>
+                                                }
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeVoucher">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                @* <!-- Test Voucher Button (For Development Only) -->
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="mt-2 border-top pt-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted"><i class="fas fa-tools me-1"></i>Testing Tools</small>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="testSendVoucher" 
+                                                    data-bs-toggle="modal" data-bs-target="#testVoucherModal">
+                                                <i class="fas fa-gift me-1"></i>Test Send Voucher
+                                            </button>
+                                        </div>
+                                    </div>
+                                } *@
+                            </div>
+                            
+                            <hr>
+                            
+                            <!-- Summary Details -->
+                            <div class="cart-summary">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tạm tính (@(Model.CartItems?.Count ?? 0) sản phẩm)</span>
+                                    <span id="cartSubtotal">@Model.Subtotal.ToString("N0") đ</span>
+                                </div>
+
+                                @if (Model.ProductDiscountAmount > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                        <div>
+                                            <span>Giảm giá sản phẩm</span>
+                                            <span class="badge bg-danger ms-1">Sale</span>
+                                        </div>
+                                        <span id="productDiscount">-@Model.ProductDiscountAmount.ToString("N0") đ</span>
+                                    </div>
+                                }
+
+                                @if (Model.RankDiscountPercent > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                        <div>
+                                            <span>Giảm giá thành viên</span>
+                                            @* <span class="badge bg-primary ms-1">@Model.RankName</span> *@
+                                            <span class="badge bg-success ms-1">-@Model.RankDiscountPercent%</span>
+                                        </div>
+                                        <span id="rankDiscount">-@Model.RankDiscountAmount.ToString("N0") đ</span>
+                                    </div>
+                                }
+
+                                @if (Model.VoucherDiscountAmount > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                        <div>
+                                            <span>Mã giảm giá</span>
+                                            <span class="badge bg-success ms-1">@Model.AppliedVoucher.Code</span>
+                                        </div>
+                                        <span id="voucherDiscount">
+                                            @if (Model.AppliedVoucher.DiscountType == "PERCENT")
+                                            {
+                                                <text>-@Model.VoucherDiscountAmount.ToString("N0") đ (@Model.AppliedVoucher.DiscountValue%)</text>
+                                            }
+                                            else
+                                            {
+                                                <text>-@Model.VoucherDiscountAmount.ToString("N0") đ</text>
+                                            }
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (Model.TotalDiscount > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 fw-bold">
+                                        <span>Tổng giảm giá</span>
+                                        <span id="totalDiscount" class="text-success">-@Model.TotalDiscount.ToString("N0") đ</span>
+                                    </div>
+                                    <hr>
+                                }
+
+                                <div class="d-flex justify-content-between total-row">
+                                    <span class="fw-bold">Thành tiền</span>
+                                    <span id="cartTotal" class="total-amount">@Model.FinalTotal.ToString("N0") đ</span>
+                                </div>
+
+                                <div class="mt-2 text-end">
+                                    @* <small class="text-muted">Đã bao gồm VAT (nếu có)</small> *@
+                                </div>
+                            </div>
+                            
+                            <!-- Checkout Actions -->
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button" class="btn btn-primary btn-lg" 
+                                        id="proceedToCheckout" data-bs-toggle="modal" data-bs-target="#addressModal">
+                                    <i class="fas fa-credit-card me-2"></i>Tiến hành thanh toán
+                                </button>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Empty Cart State -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3 class="mb-3">Giỏ hàng của bạn đang trống</h3>
+                    <p class="text-muted mb-4">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi và thêm vào giỏ hàng!</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i>Bắt đầu mua sắm
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Address Selection Modal -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">
+                    <i class="fas fa-map-marker-alt me-2"></i>Chọn địa chỉ giao hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.UserAddresses?.Any() == true)
+                {
+                    <div class="address-list">
+                        @foreach (var address in Model.UserAddresses)
+                        {
+                            <div class="address-item p-3 border rounded mb-2 @(address.IsPrimary ? "border-primary" : "")" 
+                                 data-address-id="@address.AddressID">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="selectedAddress" 
+                                           id="address_@address.AddressID" value="@address.AddressID" 
+                                           @(address.IsPrimary ? "checked" : "")>
+                                    <label class="form-check-label w-100" for="address_@address.AddressID">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="fw-bold">@address.RecipientName</div>
+                                                <div class="text-muted small">@address.Phone</div>
+                                                <div class="mt-1">
+                                                    @address.AddressLine, @address.Ward, @address.District, @address.City
+                                                </div>
+                                            </div>
+                                            @if (address.IsPrimary)
+                                            {
+                                                <span class="badge bg-primary">Mặc định</span>
+                                            }
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="fas fa-map-marker-alt text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5>Chưa có địa chỉ giao hàng</h5>
+                        <p class="text-muted mb-4">Vui lòng thêm địa chỉ để tiếp tục đặt hàng</p>
+                        <a href="@Url.Action("Addresses", "Account")" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Thêm địa chỉ mới
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                @if (Model.UserAddresses?.Any() == true)
+                {
+                    <button type="button" class="btn btn-primary" id="confirmAddress">
+                        <i class="fas fa-check me-2"></i>Xác nhận đặt hàng
+                    </button>
+                }
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Loading Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <h5>Đang xử lý thanh toán...</h5>
+                <p class="text-muted">Vui lòng không đóng cửa sổ này</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Method Selection Modal -->
+<div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentMethodModalLabel">
+                    <i class="fas fa-credit-card me-2"></i>Chọn phương thức thanh toán
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-methods">
+                    <div class="form-check payment-method-item mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentCOD" value="COD" checked>
+                        <label class="form-check-label w-100" for="paymentCOD">
+                            <div class="d-flex align-items-center">
+                                <div class="payment-icon me-3">
+                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                                    <div class="text-muted small">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="form-check payment-method-item">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paymentVNPay" value="VNPay">
+                        <label class="form-check-label w-100" for="paymentVNPay">
+                            <div class="d-flex align-items-center">
+                                <div class="payment-icon me-3">
+                                    <img src="/images/vnpay-logo.png" alt="VNPay" style="height: 24px;">
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Thanh toán qua VNPay</div>
+                                    <div class="text-muted small">Thanh toán trực tuyến qua cổng thanh toán VNPay</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="confirmPaymentMethod">
+                    <i class="fas fa-check me-2"></i>Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Voucher Modal -->
+<div class="modal fade" id="testVoucherModal" tabindex="-1" aria-labelledby="testVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testVoucherModalLabel">
+                    <i class="fas fa-gift me-2"></i>Test Send Voucher
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Development Tool:</strong> This is for testing purposes only.
+                </div>
+                
+                <form id="testVoucherForm">
+                    <div class="mb-3">
+                        <label for="testVoucherType" class="form-label">Voucher Type</label>
+                        <select class="form-select" id="testVoucherType">
+                            <option value="system">System-wide Voucher</option>
+                            <option value="user">User-specific Voucher</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="testVoucherCode" class="form-label">Voucher Code</label>
+                        <input type="text" class="form-control" id="testVoucherCode" value="TEST@123">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="testDiscountType" class="form-label">Discount Type</label>
+                        <select class="form-select" id="testDiscountType">
+                            <option value="FIXED">Fixed Amount</option>
+                            <option value="PERCENT">Percentage</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="testDiscountValue" class="form-label">Discount Value</label>
+                        <input type="number" class="form-control" id="testDiscountValue" value="50000">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="testAppliesTo" class="form-label">Applies To</label>
+                        <select class="form-select" id="testAppliesTo">
+                            <option value="Order">Entire Order</option>
+                            <option value="Product">Specific Products</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="sendTestVoucher">
+                    <i class="fas fa-paper-plane me-1"></i>Send Voucher
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .cart-item.updating {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .cart-item.removing {
+            opacity: 0.5;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .cart-summary-sticky {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .address-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .address-item.selected {
+            border-color: #0d6efd !important;
+            background-color: #f8f9ff;
+        }
+        
+        /* Fix quantity input and buttons */
+        .quantity-control .input-group {
+            height: 38px;
+        }
+        .quantity-control .form-control{
+            min-height: 30px !important;
+        }
+        .quantity-control .input-group .form-control,
+        .quantity-control .input-group .btn {
+            height: 38px;
+            padding: 0.375rem;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quantity-control .input-group .form-control {
+            min-width: 50px;
+            text-align: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        
+        /* Hide spinner buttons in number input */
+        .quantity-control input[type=number]::-webkit-inner-spin-button, 
+        .quantity-control input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .quantity-control input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        @@media (max-width: 768px) {
+            .cart-summary-sticky {
+                position: static;
+            }
+            
+            .cart-item .row {
+                text-align: center;
+            }
+            
+            .cart-item .row > div {
+                margin-bottom: 10px;
+            }
+        }
+
+        .payment-method-item {
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-method-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .payment-method-item.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
+        }
+
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Test voucher functionality
+        $(document).ready(function() {
+            $('#sendTestVoucher').on('click', function() {
+                const voucherType = $('#testVoucherType').val();
+                const voucherCode = $('#testVoucherCode').val();
+                const discountType = $('#testDiscountType').val();
+                const discountValue = $('#testDiscountValue').val();
+                const appliesTo = $('#testAppliesTo').val();
+                
+                if (!voucherCode || !discountValue) {
+                    utils.showToast('Please fill all required fields', 'warning');
+                    return;
+                }
+                
+                // Show loading state
+                const $btn = $(this);
+                const originalText = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Processing...');
+                
+                // Send AJAX request to create test voucher
+                $.ajax({
+                    url: '/Cart/CreateTestVoucher',
+                    type: 'POST',
+                    data: {
+                        isSystemWide: voucherType === 'system',
+                        code: voucherCode,
+                        discountType: discountType,
+                        discountValue: discountValue,
+                        appliesTo: appliesTo
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#testVoucherModal').modal('hide');
+                            utils.showToast(response.message, 'success');
+                            
+                            // If it's a system-wide voucher, update the voucher code input
+                            if (voucherType === 'system') {
+                                $('#voucherCode').val(voucherCode);
+                            }
+                        } else {
+                            utils.showToast(response.message || 'Failed to create test voucher', 'error');
+                        }
+                    },
+                    error: function() {
+                        utils.showToast('An error occurred while creating the test voucher', 'error');
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <script>
+        // Cart Management Object
+        const CartManager = {
+            // Initialize cart functionality
+            init: function() {
+                // Remove any existing event handlers first
+                this.unbindEvents();
+                this.bindEvents();
+            },
+
+            // Unbind all event listeners
+            unbindEvents: function() {
+                $(document).off('.cartManager');
+                $('#applyVoucherForm').off('.cartManager');
+            },
+
+            // Bind all event listeners using event delegation
+            bindEvents: function() {
+                const self = this;
+                
+                // Quantity control buttons - using event delegation
+                $(document).on('click.cartManager', '.quantity-btn', function() {
+                    self.handleQuantityButton($(this));
+                });
+
+                // Direct quantity input change - using event delegation
+                $(document).on('change.cartManager blur.cartManager', '.quantity-input', function() {
+                    const value = $(this).val().trim();
+                    // Ensure empty inputs get a default value
+                    if (value === '' || isNaN(parseInt(value))) {
+                        const min = parseInt($(this).attr('min')) || 1;
+                        const lastValidValue = $(this).data('last-valid-value') || min;
+                        $(this).val(lastValidValue);
+                    }
+                    CartManager.handleQuantityChange($(this));
+                });
+
+                // Prevent non-numeric input for quantity
+                $(document).on('input.cartManager', '.quantity-input', function(e) {
+                    const value = e.target.value;
+                    if (!/^\d*$/.test(value)) {
+                        e.target.value = value.replace(/\D/g, '');
+                        utils.showToast('Vui lòng chỉ nhập số', 'warning');
+                    }
+                    
+                    // Handle empty input
+                    if (value === '') {
+                        const min = parseInt($(this).attr('min')) || 1;
+                        $(this).data('last-valid-value', min);
+                    } else if (value !== '' && !isNaN(parseInt(value))) {
+                        $(this).data('last-valid-value', parseInt(value));
+                    }
+                });
+
+                // Prevent non-numeric keypress for quantity inputs
+                $(document).on('keypress.cartManager', '.quantity-input', function(e) {
+                    const charCode = (e.which) ? e.which : e.keyCode;
+                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                        e.preventDefault();
+                        utils.showToast('Vui lòng chỉ nhập số', 'warning');
+                        return false;
+                    }
+                    return true;
+                });
+
+                // Remove cart item - using event delegation
+                $(document).on('click.cartManager', '.btn-remove-cart-item', function() {
+                    self.handleRemoveItem($(this));
+                });
+
+                // Clear cart - using event delegation
+                $(document).on('click.cartManager', '#clearCart', function() {
+                    self.handleClearCart();
+                });
+
+                // Apply voucher - using namespaced event
+                $('#applyVoucherForm').on('submit.cartManager', function(e) {
+                    e.preventDefault();
+                    self.handleApplyVoucher();
+                });
+
+                // Remove voucher - using event delegation
+                $(document).on('click.cartManager', '#removeVoucher', function() {
+                    self.handleRemoveVoucher();
+                });
+
+                // Address selection - using event delegation
+                $(document).on('click.cartManager', '.address-item', function() {
+                    self.handleAddressSelection($(this));
+                });
+
+                // Confirm address and checkout - using event delegation
+                $(document).on('click.cartManager', '#confirmAddress', function() {
+                    self.handleCheckout();
+                });
+
+                // Auto-save quantity after typing (debounced) - using event delegation
+                let quantityTimeout;
+                $(document).on('input.cartManager', '.quantity-input', function() {
+                    const $input = $(this);
+                    clearTimeout(quantityTimeout);
+                    quantityTimeout = setTimeout(() => {
+                        self.handleQuantityChange($input);
+                    }, 800);
+                });
+
+                // Payment method confirmation - using event delegation
+                $(document).on('click.cartManager', '#confirmPaymentMethod', function() {
+                    CartManager.handlePaymentMethodConfirm();
+                });
+            },
+
+            // Handle quantity button clicks
+            handleQuantityButton: function($button) {
+                const $input = $button.siblings('.quantity-input');
+                const action = $button.data('action');
+                const currentValue = parseInt($input.val()) || 1;
+                const max = parseInt($input.attr('max')) || 99;
+                const min = parseInt($input.attr('min')) || 1;
+                
+                let newValue = currentValue;
+                if (action === 'increase' && currentValue < max) {
+                    newValue = currentValue + 1;
+                } else if (action === 'decrease' && currentValue > min) {
+                    newValue = currentValue - 1;
+                } else if (isNaN(currentValue)) {
+                    // Handle non-numeric value
+                    newValue = min;
+                    utils.showToast('Số lượng không hợp lệ, đã đặt về giá trị tối thiểu', 'warning');
+                }
+                
+                if (newValue !== currentValue) {
+                    $input.val(newValue);
+                    this.updateCartItemQuantity($input.data('cart-item-id'), newValue, $input);
+                }
+            },
+
+            // Handle direct quantity input change
+            handleQuantityChange: function($input) {
+                const cartItemId = $input.data('cart-item-id');
+                let quantity = parseInt($input.val());
+                const max = parseInt($input.attr('max')) || 99;
+                const min = parseInt($input.attr('min')) || 1;
+                const lastValidValue = $input.data('last-valid-value') || min;
+                
+                // Validate and correct quantity
+                if (isNaN(quantity) || quantity < min) {
+                    quantity = lastValidValue < min ? min : lastValidValue;
+                    $input.val(quantity);
+                    utils.showToast('Số lượng phải là số và lớn hơn 0', 'warning');
+                } else if (quantity > max) {
+                    quantity = max;
+                    $input.val(quantity);
+                    utils.showToast('Số lượng tối đa là ' + max, 'warning');
+                }
+
+                // Store the valid value for future reference
+                $input.data('last-valid-value', quantity);
+                
+                this.updateCartItemQuantity(cartItemId, quantity, $input);
+            },
+
+            // Handle remove item
+            handleRemoveItem: function($button) {
+                const cartItemId = $button.data('cart-item-id');
+                const $cartItem = $button.closest('.cart-item');
+                const productName = $cartItem.find('h6').text().trim();
+                
+                this.showConfirm(
+                    'Xác nhận xóa',
+                    `Bạn có chắc chắn muốn xóa "${productName}" khỏi giỏ hàng?`,
+                    () => this.removeCartItem(cartItemId, $cartItem)
+                );
+            },
+
+            // Handle clear cart
+            handleClearCart: function() {
+                this.showConfirm(
+                    'Xác nhận xóa tất cả',
+                    'Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?',
+                    () => this.clearCart()
+                );
+            },
+
+            // Clear entire cart
+            clearCart: function() {
+                const $clearBtn = $('#clearCart');
+                const originalText = $clearBtn.html();
+                
+                $clearBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...');
+                
+                $.ajax({
+                    url: '/Cart/ClearCart',
+                    type: 'POST',
+                    success: (response) => {
+                        if (response.success) {
+                            // Update cart count badge if available
+                            if (response.cartCount !== undefined) {
+                                window.updateCartCount(response.cartCount);
+                            }
+                            
+                            // Refresh entire cart via AJAX
+                            $.ajax({
+                                url: '/Cart/Index',
+                                type: 'GET',
+                                success: (html) => {
+                                    // Extract the main content from the response
+                                    const $newContent = $(html).find('.container-fluid').first();
+                                    // Replace the current content with new content
+                                    $('.container-fluid').first().replaceWith($newContent);
+                                    // Reinitialize cart functionality
+                                    CartManager.init();
+                                    utils.showToast('Đã xóa toàn bộ giỏ hàng', 'success');
+                                },
+                                error: () => {
+                                    utils.showToast('Không thể cập nhật giỏ hàng', 'error');
+                                }
+                            });
+                        } else {
+                            utils.showToast(response.message || 'Không thể xóa giỏ hàng', 'error');
+                        }
+                    },
+                    error: () => {
+                        utils.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                    },
+                    complete: () => {
+                        $clearBtn.prop('disabled', false).html(originalText);
+                    }
+                });
+            },
+
+            // Apply voucher
+            handleApplyVoucher: function() {
+                const voucherCode = $('#voucherCode').val().trim();
+                
+                if (!voucherCode) {
+                    utils.showToast('Vui lòng nhập mã giảm giá', 'warning');
+                    $('#voucherCode').focus();
+                    return;
+                }
+                
+                this.applyVoucher(voucherCode);
+            },
+
+            // Remove voucher
+            handleRemoveVoucher: function() {
+                this.removeVoucher();
+            },
+
+            // Handle address selection
+            handleAddressSelection: function($addressItem) {
+                $('.address-item').removeClass('selected');
+                $addressItem.addClass('selected');
+                $addressItem.find('input[type="radio"]').prop('checked', true);
+            },
+
+            // Handle checkout
+            handleCheckout: function() {
+                const selectedAddressId = $('input[name="selectedAddress"]:checked').val();
+                if (!selectedAddressId) {
+                    utils.showToast('Vui lòng chọn một địa chỉ giao hàng', 'warning');
+                    return;
+                }
+
+                // Show payment method modal
+                $('#addressModal').modal('hide');
+                $('#paymentMethodModal').modal('show');
+            },
+
+            // Handle payment method confirmation
+            handlePaymentMethodConfirm: function() {
+                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+                const selectedAddressId = $('input[name="selectedAddress"]:checked').val();
+
+                $('#paymentMethodModal').modal('hide');
+                $('#paymentModal').modal('show');
+
+                $.ajax({
+                    url: '/Cart/Checkout',
+                    type: 'POST',
+                    data: { 
+                        addressId: selectedAddressId,
+                        paymentMethod: paymentMethod
+                    },
+                    success: (response) => {
+                        setTimeout(() => {
+                            $('#paymentModal').modal('hide');
+                            if (response.success) {
+                                if (paymentMethod === 'VNPay') {
+                                    $.ajax({
+                                        url: '/Payment/ProcessVNPayPayment',
+                                        type: 'POST',
+                                        data: { orderId: response.orderId },
+                                        success: (paymentResponse) => {
+                                            if (paymentResponse.success && paymentResponse.paymentUrl) {
+                                                window.location.href = paymentResponse.paymentUrl;
+                                            } else {
+                                                utils.showToast(paymentResponse.message || 'Không thể tạo URL thanh toán VNPay', 'error');
+                                            }
+                                        },
+                                        error: () => {
+                                            utils.showToast('Có lỗi xảy ra khi xử lý thanh toán VNPay', 'error');
+                                        }
+                                    });
+                                } else {
+                                    utils.showToast('Đặt hàng thành công!', 'success');
+                                    setTimeout(() => {
+                                        window.location.href = '@Url.Action("Orders", "Account")';
+                                    }, 2000);
+                                }
+                            } else {
+                                utils.showToast(response.message || 'Đặt hàng thất bại. Vui lòng thử lại.', 'error');
+                            }
+                        }, 2000);
+                    },
+                    error: () => {
+                        setTimeout(() => {
+                            $('#paymentModal').modal('hide');
+                            utils.showToast('Có lỗi xảy ra trong quá trình đặt hàng', 'error');
+                        }, 2000);
+                    }
+                });
+            },
+
+            // Update cart item quantity via AJAX
+            updateCartItemQuantity: function(cartItemId, quantity, $input) {
+                const $cartItem = $(`.cart-item[data-cart-item-id="${cartItemId}"]`);
+                const $quantityControls = $cartItem.find('.quantity-btn, .quantity-input');
+                
+                // Show loading state
+                $cartItem.addClass('updating');
+                $quantityControls.prop('disabled', true);
+
+                $.ajax({
+                    url: '/Cart/UpdateQuantity',
+                    type: 'POST',
+                    data: { cartItemId: cartItemId, quantity: quantity },
+                    success: (response) => {
+                        if (response.success) {
+                            // Update cart count badge if available
+                            if (response.cartCount !== undefined) {
+                                window.updateCartCount(response.cartCount);
+                            }
+                            
+                            // Refresh the cart summary part via AJAX
+                            $.ajax({
+                                url: '/Cart/Index',
+                                type: 'GET',
+                                success: (html) => {
+                                    // Extract the cart summary from the response
+                                    const $newCartSummary = $(html).find('.cart-summary-sticky').first();
+                                    // Replace the current cart summary with new content
+                                    $('.cart-summary-sticky').first().replaceWith($newCartSummary);
+                                    
+                                    // Update the item subtotal directly to avoid flickering
+                                    this.updateItemSubtotal(cartItemId, response.subtotal);
+                                    
+                                    // Store the new quantity as original value
+                                    $input.data('original-value', quantity);
+                                },
+                                error: () => {
+                                    utils.showToast('Không thể cập nhật tóm tắt giỏ hàng', 'error');
+                                }
+                            });
+                        } else {
+                            utils.showToast(response.message || 'Không thể cập nhật số lượng', 'error');
+                            $input.val($input.data('original-value') || 1);
+                        }
+                    },
+                    error: () => {
+                        utils.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                        $input.val($input.data('original-value') || 1);
+                    },
+                    complete: () => {
+                        $cartItem.removeClass('updating');
+                        $quantityControls.prop('disabled', false);
+                    }
+                });
+            },
+
+            // Remove cart item
+            removeCartItem: function(cartItemId, $cartItem) {
+                $cartItem.addClass('removing');
+                
+                $.ajax({
+                    url: '/Cart/RemoveFromCart',
+                    type: 'POST',
+                    data: { cartItemId: cartItemId },
+                    success: (response) => {
+                        if (response.success) {
+                            // Update cart count badge if available
+                            if (response.cartCount !== undefined) {
+                                window.updateCartCount(response.cartCount);
+                            }
+                            
+                            // Refresh the entire cart HTML
+                            $.ajax({
+                                url: '/Cart/Index',
+                                type: 'GET',
+                                success: (html) => {
+                                    // Extract the main content from the response
+                                    const $newContent = $(html).find('.container-fluid').first();
+                                    // Replace the current content with new content
+                                    $('.container-fluid').first().replaceWith($newContent);
+                                    utils.showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'success');
+                                },
+                                error: () => {
+                                    $cartItem.removeClass('removing');
+                                    utils.showToast('Không thể cập nhật giỏ hàng', 'error');
+                                }
+                            });
+                        } else {
+                            $cartItem.removeClass('removing');
+                            utils.showToast(response.message || 'Không thể xóa sản phẩm', 'error');
+                        }
+                    },
+                    error: () => {
+                        $cartItem.removeClass('removing');
+                        utils.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                    }
+                });
+            },
+
+            // Process checkout
+            processCheckout: function(addressId) {
+                $('#addressModal').modal('hide');
+                $('#paymentModal').modal('show');
+
+                $.ajax({
+                    url: '/Cart/Checkout',
+                    type: 'POST',
+                    data: { addressId: addressId },
+                    success: (response) => {
+                        setTimeout(() => {
+                            $('#paymentModal').modal('hide');
+                            if (response.success) {
+                                utils.showToast('Thanh toán thành công! Đơn hàng của bạn đã được tạo.', 'success');
+                                setTimeout(() => {
+                                    window.location.href = '@Url.Action("Orders", "Account")';
+                                }, 2000);
+                            } else {
+                                utils.showToast(response.message || 'Thanh toán thất bại. Vui lòng thử lại.', 'error');
+                            }
+                        }, 2000);
+                    },
+                    error: () => {
+                        setTimeout(() => {
+                            $('#paymentModal').modal('hide');
+                            utils.showToast('Có lỗi xảy ra trong quá trình thanh toán', 'error');
+                        }, 2000);
+                    }
+                });
+            },
+
+            // Update cart display elements
+            updateCartDisplay: function(response) {
+                if (response.cart) {
+                    const cart = response.cart;
+                    $('#cartSubtotal').text(cart.subtotal.toLocaleString() + ' đ');
+                    
+                    // Update rank discount if exists
+                    if (cart.rankDiscountAmount > 0) {
+                        $('#rankDiscount').text('-' + cart.rankDiscountAmount.toLocaleString() + ' đ');
+                    }
+
+                    // Update voucher discount if exists
+                    if (cart.voucherDiscountAmount > 0) {
+                        const voucherText = response.discountType === 'PERCENT' 
+                            ? `-${cart.voucherDiscountAmount.toLocaleString()} đ (${response.discountPercent}%)`
+                            : `-${cart.voucherDiscountAmount.toLocaleString()} đ`;
+                        $('#voucherDiscount').html(voucherText);
+                    }
+
+                    // Update total discount
+                    $('#totalDiscount').text('-' + cart.totalDiscountAmount.toLocaleString() + ' đ');
+                    
+                    // Update final total
+                    $('#cartTotal').text(cart.totalPrice.toLocaleString() + ' đ');
+                    
+                    // Update item count
+                    $('.page-title .badge').text(cart.cartItemsCount + ' sản phẩm');
+                    $('.d-flex.justify-content-between.mb-2:first').find('span:first').text('Tạm tính (' + cart.cartItemsCount + ' sản phẩm)');
+                }
+            },
+
+            // Update individual item subtotal
+            updateItemSubtotal: function(cartItemId, subtotal) {
+                $(`.cart-item[data-cart-item-id="${cartItemId}"] .subtotal-amount`)
+                    .text(subtotal.toLocaleString() + ' đ')
+                    .addClass('text-success')
+                    .delay(1000)
+                    .queue(function() {
+                        $(this).removeClass('text-success').dequeue();
+                    });
+            },
+
+            // Update voucher display
+            updateVoucherDisplay: function(response, status, errorMessage) {
+                const $voucherMessage = $('#voucherMessage');
+                $voucherMessage.empty();
+                
+                if (status === 'success' && response) {
+                    // Voucher successfully applied
+                    const voucherCode = response.voucherCode || $('#voucherCode').val();
+                    const discountType = response.discountType || 'FIXED';
+                    const discountValue = response.discountPercent || 0;
+                    
+                    let badgeHtml = '';
+                    if (discountType === 'PERCENT') {
+                        badgeHtml = `<span class="badge bg-success ms-1">-${discountValue}%</span>`;
+                    }
+                    
+                    const html = `
+                        <div class="d-flex justify-content-between align-items-center alert alert-success py-2 mb-0">
+                            <div>
+                                <i class="fas fa-check-circle me-1"></i>
+                                <span>Đã áp dụng: <strong>${voucherCode}</strong></span>
+                                ${badgeHtml}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeVoucher">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    $voucherMessage.html(html);
+                } else if (status === 'error') {
+                    // Error applying voucher
+                    const message = errorMessage || 'Không thể áp dụng mã giảm giá';
+                    $voucherMessage.html(`
+                        <div class="alert alert-danger py-2 mb-0">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            ${message}
+                        </div>
+                    `);
+                    
+                    // Auto-hide error message after 5 seconds
+                    setTimeout(() => {
+                        $voucherMessage.find('.alert-danger').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+                // If status is 'clear', we just empty the container which was done at the beginning
+            },
+
+            // Show empty cart state
+            showEmptyCartState: function() {
+                $('.container-fluid').html(`
+                    <div class="row">
+                        <div class="col-12">
+                            <nav aria-label="breadcrumb" class="mb-4">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+                                </ol>
+                            </nav>
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+                                </div>
+                                <h3 class="mb-3">Giỏ hàng của bạn đang trống</h3>
+                                <p class="text-muted mb-4">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi và thêm vào giỏ hàng!</p>
+                                <a href="@Url.Action("Index", "Product")" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-shopping-bag me-2"></i>Bắt đầu mua sắm
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            },
+
+            // Show confirmation dialog
+            showConfirm: function(title, message, onConfirm) {
+                if (confirm(message)) {
+                    onConfirm();
+                }
+            },
+
+            // Apply voucher
+            applyVoucher: function(voucherCode) {
+                const $form = $('#applyVoucherForm');
+                const $submitBtn = $form.find('button[type="submit"]');
+                const $input = $('#voucherCode');
+                const originalBtnContent = $submitBtn.html();
+                
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                $input.prop('disabled', true);
+                
+                $.ajax({
+                    url: '/Cart/ApplyVoucher',
+                    type: 'POST',
+                    data: { voucherCode: voucherCode },
+                    success: (response) => {
+                        if (response.success) {
+                            // Refresh the cart summary part via AJAX
+                            $.ajax({
+                                url: '/Cart/Index',
+                                type: 'GET',
+                                success: (html) => {
+                                    // Extract the cart summary from the response
+                                    const $newCartSummary = $(html).find('.cart-summary-sticky').first();
+                                    // Replace the current cart summary with new content
+                                    $('.cart-summary-sticky').first().replaceWith($newCartSummary);
+                                    utils.showToast(response.message, 'success');
+                                },
+                                error: () => {
+                                    utils.showToast('Không thể cập nhật tóm tắt giỏ hàng', 'error');
+                                }
+                            });
+                        } else {
+                            this.updateVoucherDisplay(null, 'error', response.message);
+                            utils.showToast(response.message || 'Không thể áp dụng mã giảm giá', 'error');
+                        }
+                    },
+                    error: () => {
+                        utils.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                    },
+                    complete: () => {
+                        $submitBtn.prop('disabled', false).html(originalBtnContent);
+                        $input.prop('disabled', false);
+                    }
+                });
+            },
+
+            // Remove voucher
+            removeVoucher: function() {
+                const $removeBtn = $('#removeVoucher');
+                const originalHtml = $removeBtn.html();
+                
+                $removeBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '/Cart/ClearVoucher',
+                    type: 'POST',
+                    success: (response) => {
+                        if (response.success) {
+                            // Refresh the cart summary part via AJAX
+                            $.ajax({
+                                url: '/Cart/Index',
+                                type: 'GET',
+                                success: (html) => {
+                                    // Extract the cart summary from the response
+                                    const $newCartSummary = $(html).find('.cart-summary-sticky').first();
+                                    // Replace the current cart summary with new content
+                                    $('.cart-summary-sticky').first().replaceWith($newCartSummary);
+                                    $('#voucherCode').val('');
+                                    utils.showToast('Đã xóa mã giảm giá', 'success');
+                                },
+                                error: () => {
+                                    utils.showToast('Không thể cập nhật tóm tắt giỏ hàng', 'error');
+                                }
+                            });
+                        } else {
+                            utils.showToast(response.message || 'Không thể xóa mã giảm giá', 'error');
+                        }
+                    },
+                    error: () => {
+                        utils.showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                    },
+                    complete: () => {
+                        $removeBtn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            }
+        };
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            // Ensure CartManager is initialized only once
+            if (!window.cartManagerInitialized) {
+                CartManager.init();
+                window.cartManagerInitialized = true;
+            }
+            
+            // Store original values for inputs
+            $('.quantity-input').each(function() {
+                const value = parseInt($(this).val()) || 1;
+                $(this).data('original-value', value);
+                $(this).data('last-valid-value', value);
+            });
+        });
+    </script>
+}

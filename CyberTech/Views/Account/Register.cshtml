@@ -1,0 +1,84 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "_Layout";
+}
+
+<div class="account-container">
+    <div class="account-card">
+        <div class="account-header">
+            <h2>Đăng ký tài khoản</h2>
+            @* <p>Tham gia cùng chúng tôi ngay hôm nay!</p> *@
+        </div>
+
+        <form id="registerForm" asp-action="Register" method="post" class="account-form">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-group">
+                <label for="name" class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" id="name" name="name" required />
+                <span class="text-danger" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="username" class="form-label">Tên người dùng</label>
+                <input type="text" class="form-control" id="username" name="username" required />
+                <span class="text-danger" id="usernameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required />
+                <span class="text-danger" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <div class="password-input-group">
+                    <input type="password" class="form-control" id="password" name="password" required />
+                    <button type="button" class="password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.</div>
+                <span class="text-danger" id="passwordError"></span>
+            </div>
+
+            <button type="submit" class="btn-account btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Đăng ký
+            </button>
+        </form>
+
+        <div class="social-login">
+            <div class="social-login-title">Hoặc đăng ký bằng</div>
+            <div class="social-buttons">
+                <a href="/Account/ExternalLogin?provider=Google" class="social-btn btn-google">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </a>
+                <a href="/Account/ExternalLogin?provider=Facebook" class="social-btn btn-facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="account-links">
+            <a asp-action="Login">
+                <i class="fas fa-sign-in-alt"></i>
+                Đã có tài khoản? Đăng nhập
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-pages.css">
+    <link rel="stylesheet" href="~/css/HomePage_Layout/styles.css">
+}
+
+@section Scripts {
+    <script src="~/js/register.js"></script>
+}

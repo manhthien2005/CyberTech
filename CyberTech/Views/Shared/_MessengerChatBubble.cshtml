@@ -1,0 +1,21 @@
+<div id="messenger-chat-bubble" class="social-chat-bubble messenger-bubble">
+    <div class="bubble-trigger" onclick="openMessengerChat()">
+        <i class="fab fa-facebook-messenger"></i>
+    </div>
+    <div class="bubble-tooltip">
+        <span>Chat Messenger</span>
+    </div>
+</div>
+
+<script>
+function openMessengerChat() {
+    // Option 1: Link to Facebook Page messages
+    const facebookPageId = "cybertech.shop"; // Thay Facebook Page username thực tế
+    const messengerUrl = `https://m.me/${facebookPageId}`;
+    
+    // Option 2: Facebook Customer Chat Plugin (nếu muốn embed)
+    // const customerChatUrl = `https://www.facebook.com/v18.0/plugins/customerchat.php?page_id=${pageId}`;
+    
+    window.open(messengerUrl, '_blank');
+}
+</script> 

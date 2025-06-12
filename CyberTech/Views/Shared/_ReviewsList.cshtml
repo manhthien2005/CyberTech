@@ -1,0 +1,38 @@
+@model List<CyberTech.Models.Review>
+
+@if (Model?.Any() == true)
+{
+    @foreach (var review in Model)
+    {
+        <div class="review-item">
+            <div class="reviewer-info">
+                <div class="reviewer-avatar">
+                    <img src="/placeholder.svg?height=50&width=50" alt="User Avatar">
+                </div>
+                <div class="reviewer-name-date">
+                    <div class="reviewer-name">@(review.User?.Name ?? "Người dùng")</div>
+                    <div class="review-date">@review.CreatedAt.ToString("dd/MM/yyyy")</div>
+                </div>
+            </div>
+            <div class="review-rating">
+                @for (int i = 0; i < review.Rating; i++)
+                {
+                    <i class="fas fa-star"></i>
+                }
+                @for (int i = 0; i < 5 - review.Rating; i++)
+                {
+                    <i class="far fa-star"></i>
+                }
+            </div>
+            <div class="review-content">
+                <p>@(string.IsNullOrEmpty(review.Comment) ? "Người dùng không để lại nhận xét." : review.Comment)</p>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="no-reviews">
+        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+    </div>
+} 

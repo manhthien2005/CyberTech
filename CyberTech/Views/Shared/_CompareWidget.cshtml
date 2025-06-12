@@ -1,0 +1,598 @@
+<!-- Floating Compare Chat Bubble -->
+<div class="floating-compare-bubble" id="floatingCompareBubble">
+    <div class="bubble-trigger" onclick="toggleCompareBubble()">
+        <i class="fas fa-balance-scale"></i>
+        <span class="bubble-count" id="bubbleCount">0</span>
+    </div>
+    
+    <div class="bubble-tooltip">
+        <span>So sánh sản phẩm</span>
+    </div>
+    
+    <div class="bubble-content" id="bubbleContent" style="display: none;">
+        <div class="bubble-header">
+            <div class="bubble-title">
+                <i class="fas fa-balance-scale"></i>
+                <span>So sánh sản phẩm</span>
+            </div>
+            <button class="bubble-close" onclick="toggleCompareBubble()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="bubble-products" id="bubbleProducts">
+            <!-- Products will be loaded here -->
+        </div>
+        
+        <div class="bubble-actions">
+            <button class="btn btn-success btn-sm" onclick="viewComparison()">
+                <i class="fas fa-eye"></i> Xem so sánh
+            </button>
+            <button class="btn btn-outline-danger btn-sm" onclick="clearComparison()">
+                <i class="fas fa-trash"></i> Xóa tất cả
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.floating-compare-bubble {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    z-index: 999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.bubble-trigger {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #198754, #20c997);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 5px 25px rgba(25, 135, 84, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.bubble-trigger:hover {
+    transform: translateX(-10px) scale(1.1);
+    box-shadow: 0 8px 30px rgba(25, 135, 84, 0.5);
+    background: linear-gradient(135deg, #157347, #0d7f4a);
+}
+
+.bubble-trigger i {
+    color: white;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.bubble-trigger:hover i {
+    transform: rotate(15deg);
+}
+
+.bubble-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #fd7e14, #dc3545);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid white;
+    animation: pulse 2s infinite;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+@@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.bubble-tooltip {
+    position: absolute;
+    top: 50%;
+    right: 75px;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1001;
+}
+
+.bubble-trigger:hover + .bubble-tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.bubble-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-left-color: rgba(0, 0, 0, 0.8);
+}
+
+.bubble-content {
+    position: absolute;
+    bottom: 0px;
+    right: 65px;
+    width: 350px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 998;
+}
+
+.bubble-content.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.bubble-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 50px;
+    border: 12px solid transparent;
+    border-top-color: white;
+}
+
+.bubble-header {
+    background: linear-gradient(135deg, #198754, #157347);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bubble-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.bubble-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bubble-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.bubble-products {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.compare-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.compare-item:hover {
+    background: #e9ecef;
+    border-color: #198754;
+    transform: translateX(5px);
+}
+
+.compare-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.compare-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.compare-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.compare-item-price {
+    font-size: 13px;
+    color: #198754;
+    font-weight: 600;
+}
+
+.btn-remove-compare {
+    background: #ff4757;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-compare:hover {
+    background: #ff3838;
+    transform: scale(1.1);
+}
+
+.bubble-actions {
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 10px;
+    background: #f8f9fa;
+}
+
+.bubble-actions .btn {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.bubble-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.bubble-actions .btn-success {
+    background: linear-gradient(135deg, #198754, #20c997);
+    border-color: #198754;
+    color: white;
+}
+
+.bubble-actions .btn-success:hover {
+    background: linear-gradient(135deg, #157347, #0d7f4a);
+    border-color: #157347;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+.empty-compare {
+    padding: 30px 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: #198754;
+    margin-bottom: 15px;
+    opacity: 0.6;
+}
+
+.empty-text p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.empty-text p:first-child {
+    color: #495057;
+    font-size: 16px;
+}
+
+.empty-text p:last-child {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .floating-compare-bubble {
+        bottom: 90px;
+        right: 20px;
+    }
+    
+    .bubble-content {
+        width: 300px;
+    }
+    
+    .bubble-trigger {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .bubble-trigger i {
+        font-size: 18px;
+    }
+}
+
+@@media (max-width: 480px) {
+    .floating-compare-bubble {
+        bottom: 90px;
+        right: 20px;
+    }
+    
+    .bubble-content {
+        width: 280px;
+        right: -30px;
+    }
+    
+    .bubble-trigger {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .bubble-trigger i {
+        font-size: 16px;
+    }
+}
+
+/* Scrollbar styling */
+.bubble-products::-webkit-scrollbar {
+    width: 6px;
+}
+
+.bubble-products::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.bubble-products::-webkit-scrollbar-thumb {
+    background: #198754;
+    border-radius: 10px;
+}
+
+.bubble-products::-webkit-scrollbar-thumb:hover {
+    background: #157347;
+}
+</style>
+
+<script>
+// Đảm bảo jQuery available
+function initializeCompareWidget() {
+    if (typeof $ === 'undefined') {
+        console.log('⚠️ jQuery not loaded, retrying...');
+        setTimeout(initializeCompareWidget, 100);
+        return;
+    }
+    
+    console.log('✅ jQuery loaded, initializing widget...');
+    
+    // Load ngay khi DOM ready
+    updateCompareBubble(0, []);
+    
+    // Load compare products on page load
+    loadCompareProducts();
+    
+    // Close bubble when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.floating-compare-bubble').length) {
+            closeBubble();
+        }
+    });
+    
+    // Reload khi page được focus lại
+    $(window).on('focus pageshow', function() {
+        loadCompareProducts();
+    });
+}
+
+// Start initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCompareWidget);
+} else {
+    initializeCompareWidget();
+}
+
+function toggleCompareBubble() {
+    const bubbleContent = $('#bubbleContent');
+    const isVisible = bubbleContent.is(':visible');
+    
+    if (isVisible) {
+        closeBubble();
+    } else {
+        openBubble();
+    }
+}
+
+function openBubble() {
+    const bubbleContent = $('#bubbleContent');
+    const bubbleTrigger = $('#floatingCompareBubble .bubble-trigger');
+    bubbleContent.show();
+    bubbleTrigger.hide(); // Ẩn trigger khi mở content
+    setTimeout(() => {
+        bubbleContent.addClass('show');
+    }, 10);
+}
+
+function closeBubble() {
+    const bubbleContent = $('#bubbleContent');
+    const bubbleTrigger = $('#floatingCompareBubble .bubble-trigger');
+    bubbleContent.removeClass('show');
+    setTimeout(() => {
+        bubbleContent.hide();
+        bubbleTrigger.show(); // Hiện lại trigger khi đóng content
+    }, 300);
+}
+
+function loadCompareProducts() {
+    console.log('🔍 Loading compare products...');
+    $.ajax({
+        url: '/ProductCompare/GetCompareProducts',
+        type: 'GET',
+        cache: false,
+        dataType: 'json',
+        success: function(response) {
+            console.log('✅ API Response:', response);
+            if (response) {
+                const count = parseInt(response.count) || 0;
+                const products = response.products || [];
+                console.log('📦 Products data:', products);
+                console.log('🔢 Count:', count);
+                updateCompareBubble(count, products);
+            } else {
+                console.log('❌ No response data');
+                updateCompareBubble(0, []);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log('💥 API Error:', error, status);
+            updateCompareBubble(0, []);
+        }
+    });
+}
+
+function updateCompareBubble(count, products) {
+    const bubble = $('#floatingCompareBubble');
+    const countElement = $('#bubbleCount');
+    const productsElement = $('#bubbleProducts');
+    
+    // Luôn hiển thị bubble
+    bubble.show();
+    countElement.text(count || 0);
+    
+    if (count > 0 && products && products.length > 0) {
+        // Build products HTML
+        let html = '';
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            if (product) {
+                const productName = product.name || 'Sản phẩm';
+                const productPrice = product.price || 0;
+                const productImage = product.image || '/images/no-image.png';
+                const productId = product.productId || 0;
+                
+                html += '<div class="compare-item">';
+                html += '<img src="' + productImage + '" alt="' + productName + '" onerror="this.src=\'/images/no-image.png\'">';
+                html += '<div class="compare-item-info">';
+                html += '<div class="compare-item-name">' + productName + '</div>';
+                html += '<div class="compare-item-price">' + formatCurrency(productPrice) + '</div>';
+                html += '</div>';
+                html += '<button class="btn-remove-compare" onclick="removeFromCompareBubble(' + productId + ')" title="Xóa khỏi so sánh">';
+                html += '<i class="fas fa-times"></i>';
+                html += '</button>';
+                html += '</div>';
+            }
+        }
+        
+        productsElement.html(html);
+    } else {
+        // Hiển thị thông báo khi danh sách trống
+        const emptyHtml = '<div class="empty-compare">' +
+                         '<div class="empty-icon"><i class="fas fa-balance-scale"></i></div>' +
+                         '<div class="empty-text">' +
+                         '<p><strong>Chưa có sản phẩm nào để so sánh</strong></p>' +
+                         '<p>Thêm sản phẩm vào danh sách để bắt đầu so sánh</p>' +
+                         '</div></div>';
+        productsElement.html(emptyHtml);
+        closeBubble();
+    }
+}
+
+function viewComparison() {
+    window.location.href = '@Url.Action("Index", "ProductCompare")';
+}
+
+function clearComparison() {
+    $.ajax({
+        url: '@Url.Action("ClearCompare", "ProductCompare")',
+        type: 'POST',
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                if (window.utils) utils.showToast(response.message, 'success');
+                updateCompareBubble(0, []); // Cập nhật bubble với count 0 thay vì ẩn
+                if (window.updateCompareCount) updateCompareCount();
+            }
+        },
+        error: function() {
+            if (window.utils) utils.showToast('Có lỗi xảy ra', 'error');
+        }
+    });
+}
+
+function removeFromCompareBubble(productId) {
+    $.ajax({
+        url: '@Url.Action("RemoveFromCompare", "ProductCompare")',
+        type: 'POST',
+        data: { productId: productId },
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                if (window.utils) utils.showToast(response.message, 'success');
+                loadCompareProducts();
+                if (window.updateCompareCount) updateCompareCount();
+            }
+        },
+        error: function() {
+            if (window.utils) utils.showToast('Có lỗi xảy ra', 'error');
+        }
+    });
+}
+
+function formatCurrency(amount) {
+    if (typeof amount !== 'number') {
+        amount = parseFloat(amount) || 0;
+    }
+    return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+}
+
+// Make functions available globally
+window.loadCompareBubbleProducts = loadCompareProducts;
+window.updateCompareBubbleWidget = updateCompareBubble;
+window.toggleCompareBubble = toggleCompareBubble;
+</script> 

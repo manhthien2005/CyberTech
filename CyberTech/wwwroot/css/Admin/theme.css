@@ -1,0 +1,46 @@
+:root {
+    /* Color palette */
+    --primary-color: #0056b3;
+    --text-primary: #495057;
+    --text-secondary: #6c757d;
+    --text-light: #aaa;
+    --text-white: #fff;
+    
+    /* Background colors */
+    --bg-primary: #1e2a3a;
+    --bg-secondary: #2c3e50;
+    --bg-light: #f8f9fa;
+    --bg-white: #fff;
+    
+    /* Sidebar specific */
+    --sidebar-bg: var(--bg-primary);
+    --sidebar-hover: var(--bg-secondary);
+    --sidebar-active: #1a2533;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --collapsed-sidebar-width: 70px;
+    
+    /* Header specific */
+    --header-bg: var(--primary-color);
+    --header-text: var(--text-white);
+    
+    /* Table states */
+    --active-table: var(--primary-color);
+    --inactive-table: var(--bg-light);
+    
+    /* Scrollbar */
+    --scrollbar-track: rgba(255,255,255,0.05);
+    --scrollbar-thumb: rgba(255,255,255,0.15);
+    --scrollbar-thumb-hover: rgba(255,255,255,0.25);
+    
+    /* Border colors */
+    --border-color: #dee2e6;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-lg: 0 4px 8px rgba(0,0,0,0.1);
+    
+    /* Transitions */
+    --transition-speed: 0.3s;
+    --transition-ease: all var(--transition-speed) ease;
+}

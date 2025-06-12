@@ -1,0 +1,1061 @@
+@{
+    ViewData["Title"] = "Kho voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="account-dashboard">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            @Html.Partial("_AccountSidebar")
+        </div>
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="account-content-main">
+                <div class="vouchers-section">
+                    <h2>Kho voucher của tôi</h2>
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Voucher được cấp bởi quản trị viên thông qua các chương trình khuyến mãi, sự kiện hoặc email.
+                        Mỗi voucher chỉ có thể sử dụng một lần duy nhất.
+                    </div>
+
+                    <!-- Voucher Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="voucherTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(ViewBag.CurrentTab == "active" ? "active" : "")" 
+                               href="@Url.Action("Vouchers", new { tab = "active", page = 1 })" role="tab">
+                                <i class="fas fa-check-circle me-1 text-success"></i>Có thể sử dụng
+                                <span class="badge bg-success ms-1">@(ViewBag.ActiveCount ?? 0)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(ViewBag.CurrentTab == "used" ? "active" : "")" 
+                               href="@Url.Action("Vouchers", new { tab = "used", page = 1 })" role="tab">
+                                <i class="fas fa-history me-1 text-secondary"></i>Đã sử dụng
+                                <span class="badge bg-secondary ms-1">@(ViewBag.UsedCount ?? 0)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(ViewBag.CurrentTab == "expired" ? "active" : "")" 
+                               href="@Url.Action("Vouchers", new { tab = "expired", page = 1 })" role="tab">
+                                <i class="fas fa-times-circle me-1 text-danger"></i>Đã hết hạn
+                                <span class="badge bg-danger ms-1">@(ViewBag.ExpiredCount ?? 0)</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content pt-3" id="voucherTabsContent">
+                        <!-- Active Vouchers -->
+                        <div class="tab-pane fade @(ViewBag.CurrentTab == "active" ? "show active" : "")" id="active" role="tabpanel">
+                            @if (ViewBag.ActiveVouchers != null && ViewBag.ActiveVouchers.Count > 0)
+                            {
+                                <div class="row">
+                                    @foreach (var userVoucher in ViewBag.ActiveVouchers)
+                                    {
+                                        var voucher = userVoucher.Voucher;
+                                        var daysLeft = (voucher.ValidTo - DateTime.Now).Days;
+                                        var discountText = voucher.DiscountType == "PERCENT" 
+                                            ? $"{voucher.DiscountValue}%" 
+                                            : $"{voucher.DiscountValue.ToString("N0")}đ";
+                                        
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="voucher-card active">
+                                                <div class="voucher-header">
+                                                    <span class="voucher-code">@voucher.Code</span>
+                                                    <span class="voucher-type">
+                                                        @if (voucher.AppliesTo == "Order")
+                                                        {
+                                                            <span class="badge bg-primary">Toàn đơn hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-info">Sản phẩm</span>
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div class="voucher-body">
+                                                    <div class="discount-value">
+                                                        @if (voucher.DiscountType == "PERCENT")
+                                                        {
+                                                            <span>Giảm @discountText</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>Giảm @discountText</span>
+                                                        }
+                                                    </div>
+                                                    <div class="voucher-description">
+                                                        @(voucher.Description ?? "Không có mô tả")
+                                                    </div>
+                                                </div>
+                                                <div class="voucher-footer">
+                                                    <div class="voucher-validity">
+                                                        <i class="far fa-clock me-1"></i>
+                                                        <span>Còn @daysLeft ngày</span>
+                                                    </div>
+                                                    <div class="voucher-expiry">
+                                                        HSD: @voucher.ValidTo.ToString("dd/MM/yyyy")
+                                                    </div>
+                                                </div>
+                                                <div class="voucher-actions">
+                                                    <button class="btn btn-sm btn-outline-secondary copy-code" data-code="@voucher.Code" title="Sao chép mã">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                    <a href="@Url.Action("Index", "Cart", new { voucherCode = voucher.Code })" class="btn btn-sm btn-primary" title="Sử dụng voucher">
+                                                        <i class="fas fa-shopping-cart me-1"></i>Sử dụng
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-ticket-alt text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5>Bạn chưa có voucher nào</h5>
+                                    <p class="text-muted">Voucher sẽ được cấp qua các chương trình khuyến mãi hoặc email</p>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Used Vouchers -->
+                        <div class="tab-pane fade @(ViewBag.CurrentTab == "used" ? "show active" : "")" id="used" role="tabpanel">
+                            @if (ViewBag.UsedVouchers != null && ViewBag.UsedVouchers.Count > 0)
+                            {
+                                <div class="row">
+                                    @foreach (var userVoucher in ViewBag.UsedVouchers)
+                                    {
+                                        var voucher = userVoucher.Voucher;
+                                        var discountText = voucher.DiscountType == "PERCENT" 
+                                            ? $"{voucher.DiscountValue}%" 
+                                            : $"{voucher.DiscountValue.ToString("N0")}đ";
+                                        
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="voucher-card used">
+                                                <div class="voucher-header">
+                                                    <span class="voucher-code">@voucher.Code</span>
+                                                    <span class="voucher-type">
+                                                        @if (voucher.AppliesTo == "Order")
+                                                        {
+                                                            <span class="badge bg-secondary">Toàn đơn hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-secondary">Sản phẩm</span>
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div class="voucher-body">
+                                                    <div class="discount-value">
+                                                        <span>Giảm @discountText</span>
+                                                    </div>
+                                                    <div class="voucher-description">
+                                                        @(voucher.Description ?? "Không có mô tả")
+                                                    </div>
+                                                </div>
+                                                <div class="voucher-footer">
+                                                    <div class="voucher-validity">
+                                                        <i class="fas fa-check-circle me-1 text-success"></i>
+                                                        <span>Đã sử dụng</span>
+                                                    </div>
+                                                    <div class="voucher-expiry">
+                                                        Ngày sử dụng: @userVoucher.UsedDate?.ToString("dd/MM/yyyy")
+                                                    </div>
+                                                </div>
+                                                <div class="voucher-actions">
+                                                    @if (userVoucher.OrderID > 0)
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary view-order-details" data-id="@userVoucher.OrderID" title="Xem chi tiết đơn hàng">
+                                                            <i class="fas fa-eye me-1"></i>Xem đơn hàng
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Đã sử dụng</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-history text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5>Bạn chưa sử dụng voucher nào</h5>
+                                    <p class="text-muted">Các voucher đã sử dụng sẽ hiển thị ở đây</p>
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Expired Vouchers -->
+                        <div class="tab-pane fade @(ViewBag.CurrentTab == "expired" ? "show active" : "")" id="expired" role="tabpanel">
+                            @if (ViewBag.ExpiredVouchers != null && ViewBag.ExpiredVouchers.Count > 0)
+                            {
+                                <div class="row">
+                                    @foreach (var userVoucher in ViewBag.ExpiredVouchers)
+                                    {
+                                        var voucher = userVoucher.Voucher;
+                                        var discountText = voucher.DiscountType == "PERCENT" 
+                                            ? $"{voucher.DiscountValue}%" 
+                                            : $"{voucher.DiscountValue.ToString("N0")}đ";
+                                        
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="voucher-card expired">
+                                                <div class="voucher-header">
+                                                    <span class="voucher-code">@voucher.Code</span>
+                                                    <span class="voucher-type">
+                                                        @if (voucher.AppliesTo == "Order")
+                                                        {
+                                                            <span class="badge bg-secondary">Toàn đơn hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-secondary">Sản phẩm</span>
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <div class="voucher-body">
+                                                    <div class="discount-value">
+                                                        <span>Giảm @discountText</span>
+                                                    </div>
+                                                    <div class="voucher-description">
+                                                        @(voucher.Description ?? "Không có mô tả")
+                                                    </div>
+                                                </div>
+                                                <div class="voucher-footer">
+                                                    <div class="voucher-validity">
+                                                        <i class="fas fa-times-circle me-1 text-danger"></i>
+                                                        <span>Đã hết hạn</span>
+                                                    </div>
+                                                    <div class="voucher-expiry">
+                                                        HSD: @voucher.ValidTo.ToString("dd/MM/yyyy")
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-times-circle text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5>Không có voucher hết hạn</h5>
+                                    <p class="text-muted">Các voucher đã hết hạn sẽ hiển thị ở đây</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (ViewBag.TotalItems != null && ViewBag.TotalItems > 0)
+                    {
+                        <div class="pagination-container mt-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="pagination-info">
+                                    <span>Hiển thị @(ViewBag.StartItem ?? 0) - @(ViewBag.EndItem ?? 0) của @(ViewBag.TotalItems ?? 0) voucher</span>
+                                </div>
+                                @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+                                {
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination mb-0">
+                                            <li class="page-item @((ViewBag.CurrentPage == null || ViewBag.CurrentPage == 1) ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("Vouchers", new { tab = ViewBag.CurrentTab, page = (ViewBag.CurrentPage ?? 1) - 1 })" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            @{
+                                                var currentPage = ViewBag.CurrentPage ?? 1;
+                                                var totalPages = ViewBag.TotalPages;
+                                                var pagesToShow = 2; // Show only 2 pages before and after current page
+
+                                                // Always show first page
+                                                if (currentPage > 3)
+                                                {
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="@Url.Action("Vouchers", new { tab = ViewBag.CurrentTab, page = 1 })">1</a>
+                                                    </li>
+                                                    if (currentPage > 4)
+                                                    {
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                    }
+                                                }
+
+                                                // Show pages around current page
+                                                for (int i = Math.Max(1, currentPage - pagesToShow); i <= Math.Min(totalPages, currentPage + pagesToShow); i++)
+                                                {
+                                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                                        <a class="page-link" href="@Url.Action("Vouchers", new { tab = ViewBag.CurrentTab, page = i })">@i</a>
+                                                    </li>
+                                                }
+
+                                                // Always show last page
+                                                if (currentPage < totalPages - 2)
+                                                {
+                                                    if (currentPage < totalPages - 3)
+                                                    {
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                    }
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="@Url.Action("Vouchers", new { tab = ViewBag.CurrentTab, page = totalPages })">@totalPages</a>
+                                                    </li>
+                                                }
+                                            }
+                                            <li class="page-item @((ViewBag.CurrentPage == null || ViewBag.CurrentPage == ViewBag.TotalPages) ? "disabled" : "")">
+                                                <a class="page-link" href="@Url.Action("Vouchers", new { tab = ViewBag.CurrentTab, page = (ViewBag.CurrentPage ?? 1) + 1 })" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <!-- Order Status Timeline -->
+                    <div class="col-12">
+                        <div class="order-timeline">
+                            <div class="timeline">
+                                <div class="timeline-item" data-status="Pending">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Chờ xử lý</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item" data-status="Processing">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Đang xử lý</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item" data-status="Shipped">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-truck"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Đang giao hàng</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item" data-status="Delivered">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Giao hàng thành công</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item d-none" data-status="Cancelled">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Đã hủy</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item d-none" data-status="Returned">
+                                    <div class="timeline-point">
+                                        <i class="fas fa-undo"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6>Đã trả hàng</h6>
+                                        <p class="timeline-date"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Info & Payment -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Thông tin đơn hàng</h6>
+                                <div class="order-info">
+                                    <p><strong>Mã đơn:</strong> <span id="orderId"></span></p>
+                                    <p><strong>Ngày đặt:</strong> <span id="orderDate"></span></p>
+                                    <p><strong>Trạng thái:</strong> <span id="orderStatus"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Thông tin thanh toán</h6>
+                                <div class="payment-info">
+                                    <p><strong>Phương thức:</strong> <span id="paymentMethod"></span></p>
+                                    <p><strong>Trạng thái:</strong> <span id="paymentStatus"></span></p>
+                                    <p><strong>Ngày thanh toán:</strong> <span id="paymentDate"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Địa chỉ giao hàng</h6>
+                                <div class="address-info">
+                                    <p><strong>Người nhận:</strong> <span id="recipientName"></span></p>
+                                    <p><strong>Số điện thoại:</strong> <span id="recipientPhone"></span></p>
+                                    <p><strong>Địa chỉ:</strong> <span id="addressLine"></span></p>
+                                    <p><strong>Phường/Xã:</strong> <span id="addressWard"></span></p>
+                                    <p><strong>Quận/Huyện:</strong> <span id="addressDistrict"></span></p>
+                                    <p><strong>Tỉnh/Thành phố:</strong> <span id="addressCity"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Sản phẩm</h6>
+                                <div class="order-items">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 80px">Hình ảnh</th>
+                                                    <th>Sản phẩm</th>
+                                                    <th class="text-center">Số lượng</th>
+                                                    <th class="text-end">Đơn giá</th>
+                                                    <th class="text-end">Thành tiền</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="orderItemsTable">
+                                                <!-- Order items will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row justify-content-end">
+                                    <div class="col-md-4">
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td>Tổng tiền hàng:</td>
+                                                <td class="text-end" id="subtotal"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Giảm giá sản phẩm:</td>
+                                                <td class="text-end" id="productDiscount"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Giảm giá thành viên:</td>
+                                                <td class="text-end" id="rankDiscount"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Giảm giá voucher:</td>
+                                                <td class="text-end" id="voucherDiscount"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tổng giảm giá:</td>
+                                                <td class="text-end" id="totalDiscount"></td>
+                                            </tr>
+                                            <tr class="fw-bold">
+                                                <td>Tổng thanh toán:</td>
+                                                <td class="text-end" id="total"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-dashboard.css">
+    <style>
+        /* Status Tabs */
+        .nav-tabs {
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tabs .nav-item {
+            margin-bottom: -1px;
+        }
+        
+        .nav-tabs .nav-link {
+            border: 1px solid transparent;
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            border-color: #e9ecef #e9ecef #dee2e6;
+            color: #495057;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #0077cc;
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            border-bottom: 2px solid #0077cc;
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .nav-tabs {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Search Box */
+        .search-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        /* Voucher Card Styles */
+        .voucher-card {
+            position: relative;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .voucher-card:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .voucher-card.active {
+            border-color: #28a745;
+            box-shadow: 0 0 0 1px rgba(40, 167, 69, 0.25);
+        }
+        
+        .voucher-card.used {
+            border-color: #6c757d;
+            opacity: 0.8;
+        }
+        
+        .voucher-card.expired {
+            border-color: #dc3545;
+            opacity: 0.7;
+        }
+        
+        .voucher-header {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .voucher-code {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #495057;
+        }
+        
+        .voucher-body {
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .discount-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        
+        .voucher-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .voucher-footer {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-top: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        
+        .voucher-validity {
+            color: #6c757d;
+        }
+        
+        .voucher-expiry {
+            font-weight: 500;
+        }
+        
+        .voucher-actions {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+        }
+        
+        .voucher-actions .btn-primary {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        
+        .copy-code {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .voucher-card.active:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Card Styles */
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        /* Account Content Main */
+        .account-content-main {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        
+        .vouchers-section h2 {
+            color: #212529;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Order Timeline Styles */
+        .order-timeline {
+            position: relative;
+            padding: 20px 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .timeline {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e9ecef;
+            z-index: 1;
+        }
+
+        .timeline-item {
+            position: relative;
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.active {
+            opacity: 1;
+        }
+
+        .timeline-item.completed .timeline-point {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .timeline-item.cancelled .timeline-point {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .timeline-item.returned .timeline-point {
+            background: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .timeline-point {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            border: 2px solid #fff;
+            margin: 0 auto 10px;
+            z-index: 2;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline-point i {
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .timeline-item.active .timeline-point {
+            background: #0077cc;
+            border-color: #0077cc;
+            transform: scale(1.1);
+        }
+
+        .timeline-content {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.active .timeline-content {
+            background: #e3f2fd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timeline-content h6 {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin: 5px 0 0;
+        }
+
+        /* Modal Styles */
+        .modal-dialog.modal-xl {
+            max-width: 90%;
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        /* Status colors */
+        .status-badge {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 0.25rem;
+        }
+
+        .status-pending { background-color: #ffc107; color: #000; }
+        .status-processing { background-color: #17a2b8; color: #fff; }
+        .status-shipped { background-color: #007bff; color: #fff; }
+        .status-delivered { background-color: #28a745; color: #fff; }
+        .status-cancelled { background-color: #dc3545; color: #fff; }
+        .status-returned { background-color: #6c757d; color: #fff; }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle copy voucher code button
+            $('.copy-code').on('click', function() {
+                const voucherCode = $(this).data('code');
+                const button = $(this);
+                
+                // Use modern Clipboard API
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(voucherCode)
+                        .then(() => {
+                            // Success - change button icon and color temporarily
+                            button.html('<i class="fas fa-check"></i>');
+                            button.addClass('btn-success').removeClass('btn-outline-secondary');
+                            
+                            // Reset button after 2 seconds
+                            setTimeout(() => {
+                                button.html('<i class="fas fa-copy"></i>');
+                                button.addClass('btn-outline-secondary').removeClass('btn-success');
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Could not copy text: ', err);
+                            alert('Không thể sao chép mã voucher. Vui lòng thử lại.');
+                        });
+                } else {
+                    // Fallback for browsers that don't support clipboard API
+                    const tempInput = $('<input>');
+                    $('body').append(tempInput);
+                    tempInput.val(voucherCode).select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        
+                        // Success - change button icon and color temporarily
+                        button.html('<i class="fas fa-check"></i>');
+                        button.addClass('btn-success').removeClass('btn-outline-secondary');
+                        
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            button.html('<i class="fas fa-copy"></i>');
+                            button.addClass('btn-outline-secondary').removeClass('btn-success');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Could not copy text: ', err);
+                        alert('Không thể sao chép mã voucher. Vui lòng thử lại.');
+                    }
+                    
+                    tempInput.remove();
+                }
+            });
+
+            // Order Details Modal Functionality
+            var orderStatusMap = {
+                'Pending': 'Chờ xử lý',
+                'Processing': 'Đang xử lý', 
+                'Shipped': 'Đang giao hàng',
+                'Delivered': 'Đã giao hàng',
+                'Cancelled': 'Đã hủy',
+                'Returned': 'Đã trả hàng'
+            };
+
+            var paymentStatusMap = {
+                'Pending': 'Chờ thanh toán',
+                'Completed': 'Đã thanh toán',
+                'Failed': 'Thanh toán thất bại',
+                'Refunded': 'Đã hoàn tiền'
+            };
+
+            // Helper function to get status text
+            function getStatusText(status, statusMap) {
+                return statusMap[status] || status || 'N/A';
+            }
+
+            // View Order Details
+            $('.view-order-details').on('click', function() {
+                var orderId = $(this).data('id');
+                $.get('/Account/OrderDetails/' + orderId, function(data) {
+                    // Update modal content
+                    $('#orderId').text(data.orderId);
+                    $('#orderDate').text(new Date(data.createdAt).toLocaleString());
+                    
+                    // Update status with badge
+                    var statusClass = 'status-' + data.status.toLowerCase();
+                    var statusText = getStatusText(data.status, orderStatusMap);
+                    $('#orderStatus').html(`<span class="status-badge ${statusClass}">${statusText}</span>`);
+                    
+                    $('#paymentMethod').text(data.paymentMethod || 'Chưa thanh toán');
+
+                    var paymentStatusText = getStatusText(data.paymentStatus, paymentStatusMap);
+                    $('#paymentStatus').text(paymentStatusText);
+                    $('#paymentDate').text(data.paymentDate ? new Date(data.paymentDate).toLocaleString() : 'N/A');
+                    $('#subtotal').text(data.totalPrice.toLocaleString() + ' đ');
+                    $('#productDiscount').text(data.productDiscountAmount.toLocaleString() + ' đ');
+                    $('#rankDiscount').text(data.rankDiscountAmount.toLocaleString() + ' đ');
+                    $('#voucherDiscount').text(data.voucherDiscountAmount.toLocaleString() + ' đ');
+                    $('#totalDiscount').text(data.totalDiscountAmount.toLocaleString() + ' đ');
+                    $('#total').text(data.finalPrice.toLocaleString() + ' đ');
+
+                    // Update timeline
+                    $('.timeline-item').removeClass('active completed cancelled returned');
+                    
+                    // Hide cancelled and returned statuses by default
+                    $('.timeline-item[data-status="Cancelled"], .timeline-item[data-status="Returned"]').addClass('d-none');
+                    
+                    // Define status order for normal flow
+                    var normalStatusOrder = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+                    var currentStatusIndex = normalStatusOrder.indexOf(data.status);
+                    
+                    if (currentStatusIndex >= 0) {
+                        // Show normal flow
+                        $('.timeline-item').slice(0, 4).removeClass('d-none');
+                        
+                        // Mark all previous statuses as completed
+                        $('.timeline-item').slice(0, currentStatusIndex).addClass('completed');
+                        
+                        // Mark current status as active
+                        $(`.timeline-item[data-status="${data.status}"]`).addClass('active');
+                    } else if (data.status === 'Cancelled') {
+                        // Show cancelled status
+                        $('.timeline-item[data-status="Cancelled"]').removeClass('d-none');
+                        $(`.timeline-item[data-status="Cancelled"]`).addClass('active cancelled');
+                    } else if (data.status === 'Returned') {
+                        // Show returned status
+                        $('.timeline-item[data-status="Returned"]').removeClass('d-none');
+                        $(`.timeline-item[data-status="Returned"]`).addClass('active returned');
+                    }
+
+                    // Update order items
+                    var itemsHtml = '';
+                    data.orderItems.forEach(function(item) {
+                        itemsHtml += `
+                            <tr>
+                                <td>
+                                    <img src="${item.product.imageUrl}" class="img-thumbnail" alt="${item.product.name}" style="width: 60px; height: 60px; object-fit: cover;">
+                                </td>
+                                <td>
+                                    <div class="fw-medium">${item.product.name}</div>
+                                </td>
+                                <td class="text-center">${item.quantity}</td>
+                                <td class="text-end">${item.unitPrice.toLocaleString()} đ</td>
+                                <td class="text-end">${item.finalSubtotal.toLocaleString()} đ</td>
+                            </tr>
+                        `;
+                    });
+                    $('#orderItemsTable').html(itemsHtml);
+
+                    // Update shipping address
+                    if (data.address) {
+                        $('#recipientName').text(data.address.recipientName);
+                        $('#recipientPhone').text(data.address.phone);
+                        $('#addressLine').text(data.address.addressLine);
+                        $('#addressWard').text(data.address.ward);
+                        $('#addressDistrict').text(data.address.district);
+                        $('#addressCity').text(data.address.city);
+                    } else {
+                        $('#recipientName').text('N/A');
+                        $('#recipientPhone').text('N/A');
+                        $('#addressLine').text('N/A');
+                        $('#addressWard').text('N/A');
+                        $('#addressDistrict').text('N/A');
+                        $('#addressCity').text('N/A');
+                    }
+
+                    // Show modal
+                    var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    modal.show();
+                });
+            });
+        });
+    </script>
+} 

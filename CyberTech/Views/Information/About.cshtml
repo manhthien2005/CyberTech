@@ -1,0 +1,111 @@
+@{
+    ViewBag.Title = "Giới thiệu - CybotEcom";
+}
+
+<div class="about-page">
+    <div class="container">
+        <h1 class="page-title">Về CybotEcom</h1>
+        
+        <div class="about-content">
+            <div class="section">
+                <h2>Chúng tôi là ai?</h2>
+                <p>CybotEcom là một trong những đơn vị tiên phong trong lĩnh vực bán lẻ thiết bị điện tử và công nghệ tại Việt Nam. Với hơn 5 năm kinh nghiệm, chúng tôi tự hào mang đến cho khách hàng những sản phẩm chất lượng cao cùng dịch vụ chuyên nghiệp.</p>
+            </div>
+
+            <div class="section">
+                <h2>Tầm nhìn</h2>
+                <p>Trở thành đơn vị dẫn đầu trong lĩnh vực bán lẻ công nghệ, mang đến trải nghiệm mua sắm tốt nhất cho người dùng Việt Nam.</p>
+            </div>
+
+            <div class="section">
+                <h2>Sứ mệnh</h2>
+                <p>Mang công nghệ đến gần hơn với người dùng Việt Nam thông qua các sản phẩm chất lượng và dịch vụ chuyên nghiệp.</p>
+            </div>
+
+            <div class="section">
+                <h2>Giá trị cốt lõi</h2>
+                <ul>
+                    <li>Chất lượng sản phẩm</li>
+                    <li>Dịch vụ chuyên nghiệp</li>
+                    <li>Đổi mới sáng tạo</li>
+                    <li>Hướng đến khách hàng</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Thành tựu</h2>
+                <div class="achievements">
+                    <div class="achievement-item">
+                        <i class="fas fa-users"></i>
+                        <h3>1M+</h3>
+                        <p>Khách hàng hài lòng</p>
+                    </div>
+                    <div class="achievement-item">
+                        <i class="fas fa-store"></i>
+                        <h3>10+</h3>
+                        <p>Cửa hàng trên toàn quốc</p>
+                    </div>
+                    <div class="achievement-item">
+                        <i class="fas fa-box"></i>
+                        <h3>100K+</h3>
+                        <p>Đơn hàng đã giao</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .about-page {
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .achievement-item {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-item i {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .achievement-item h3 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+    </style>
+} 

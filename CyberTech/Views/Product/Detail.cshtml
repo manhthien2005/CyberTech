@@ -1,0 +1,25 @@
+<!-- Add this button where appropriate in your product detail page -->
+<button class="btn btn-primary btn-add-to-cart" data-product-id="@Model.ProductID">
+    <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ hàng
+</button>
+
+@section Scripts {
+    <script>
+        document.querySelector('.btn-add-to-cart').addEventListener('click', async function() {
+            const productId = this.dataset.productId;
+            try {
+                utils.showLoadingOverlay(true);
+                const response = await utils.fetchData(`/Cart/AddToCart?productId=${productId}`, 'POST');
+                if (response.success) {
+                    utils.showToast(response.message, 'success');
+                } else {
+                    utils.showToast(response.message, 'error');
+                }
+            } catch (error) {
+                utils.showToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+            } finally {
+                utils.showLoadingOverlay(false);
+            }
+        });
+    </script>
+} 

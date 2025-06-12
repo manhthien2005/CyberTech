@@ -1,0 +1,392 @@
+
+.page-header {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #333;
+}
+.total-revenue {
+  font-size: 0.95rem;
+}
+
+.total-revenue-label {
+  font-weight: 500;
+  color: #6c757d;
+  margin-right: 5px;
+}
+
+.total-revenue-value {
+  font-weight: 700;
+  color: #28a745;
+}
+.page-header p {
+  margin: 5px 0 0;
+  color: #6c757d;
+}
+.dashboard-container {
+    padding: 20px;
+  }
+  
+  /* Stats Cards */
+  .stat-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .stat-card-icon i {
+    font-size: 24px;
+    color: white;
+  }
+  
+  .stat-card-content {
+    flex: 1;
+  }
+  
+  .stat-card-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  .stat-card-subtitle {
+    color: #6c757d;
+    margin: 5px 0;
+    font-size: 0.9rem;
+  }
+  
+  .stat-card-change {
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  
+  .stat-card-change i {
+    margin-right: 5px;
+  }
+  
+  .stat-card-change.positive {
+    color: #28a745;
+  }
+  
+  .stat-card-change.negative {
+    color: #dc3545;
+  }
+  
+  /* Card Variants */
+  .stat-card.revenue .stat-card-icon {
+    background-color: rgba(40, 167, 69, 0.2);
+  }
+  
+  .stat-card.revenue .stat-card-icon i {
+    color: #28a745;
+  }
+  
+  .stat-card.revenue .stat-card-title {
+    color: #28a745;
+  }
+  
+  .stat-card.orders .stat-card-icon {
+    background-color: rgba(0, 123, 255, 0.2);
+  }
+  
+  .stat-card.orders .stat-card-icon i {
+    color: #007bff;
+  }
+  
+  .stat-card.orders .stat-card-title {
+    color: #007bff;
+  }
+  
+  .stat-card.customers .stat-card-icon {
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+  
+  .stat-card.customers .stat-card-icon i {
+    color: #ffc107;
+  }
+  
+  .stat-card.customers .stat-card-title {
+    color: #ffc107;
+  }
+  
+  .stat-card.tables .stat-card-icon {
+    background-color: rgba(23, 162, 184, 0.2);
+  }
+  
+  .stat-card.tables .stat-card-icon i {
+    color: #17a2b8;
+  }
+  
+  .stat-card.tables .stat-card-title {
+    color: #17a2b8;
+  }
+  
+  /* Chart Container */
+  .chart-container {
+    position: relative;
+    height: 400px; 
+    width: 100%;
+  }
+  
+  /* Activity List */
+  .activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .activity-item {
+    display: flex;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .activity-icon i {
+    font-size: 16px;
+    color: white;
+  }
+  
+  .activity-content {
+    flex: 1;
+  }
+  
+  .activity-title {
+    margin: 0 0 5px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .activity-time {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  /* Activity Icon Variants */
+  .activity-icon.order {
+    background-color: rgba(0, 123, 255, 0.2);
+  }
+  
+  .activity-icon.order i {
+    color: #007bff;
+  }
+  
+  .activity-icon.customer {
+    background-color: rgba(40, 167, 69, 0.2);
+  }
+  
+  .activity-icon.customer i {
+    color: #28a745;
+  }
+  
+  .activity-icon.food {
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+  
+  .activity-icon.food i {
+    color: #ffc107;
+  }
+  
+  .activity-icon.table {
+    background-color: rgba(23, 162, 184, 0.2);
+  }
+  
+  .activity-icon.table i {
+    color: #17a2b8;
+  }
+  
+  .activity-icon.order-complete {
+    background-color: rgba(40, 167, 69, 0.2);
+  }
+  
+  .activity-icon.order-complete i {
+    color: #28a745;
+  }
+  
+  /* Card Styling */
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: none;
+    margin-bottom: 20px;
+  }
+  
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #f1f1f1;
+    padding: 15px 20px;
+  }
+  
+  .card-body {
+    padding: 0 20px;
+  }
+  
+  .card-footer {
+    background-color: #fff;
+    border-top: 1px solid #f1f1f1;
+    padding: 15px;
+  }
+  
+  /* Table Styling */
+  .table {
+    margin-bottom: 0;
+  }
+  
+  .table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .table td {
+    vertical-align: middle;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .stat-card {
+      margin-bottom: 20px;
+    }
+    
+    .chart-container {
+      height: 250px;
+    }
+  }
+
+/* Top Foods List */
+.top-foods-list {
+  min-height: 400px; /* Đảm bảo hiển thị tối thiểu 5 sản phẩm */
+  max-height: 500px; /* Giới hạn chiều cao tối đa */
+  overflow-y: auto;
+}
+
+.food-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f1f1f1;
+  transition: background-color 0.2s;
+  height: 80px; /* Chiều cao cố định cho mỗi sản phẩm */
+}
+
+.food-item:hover {
+  background-color: #f8f9fa;
+}
+
+.food-item:last-child {
+  border-bottom: none;
+}
+
+.food-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 15px;
+  font-size: 0.9rem;
+}
+
+.food-item:nth-child(1) .food-rank {
+  background-color: #ffd700;
+  color: #fff;
+}
+
+.food-item:nth-child(2) .food-rank {
+  background-color: #c0c0c0;
+  color: #fff;
+}
+
+.food-item:nth-child(3) .food-rank {
+  background-color: #cd7f32;
+  color: #fff;
+}
+
+.food-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.food-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.food-content {
+  flex: 1;
+}
+
+.food-title {
+  margin: 0 0 5px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.food-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.food-price {
+  font-weight: 600;
+  color: #28a745;
+}
+
+.food-sold {
+  color: #6c757d;
+}
+

@@ -1,0 +1,88 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_Layout";
+}
+<div class="account-container">
+    <div class="account-card">
+        <div class="account-header">
+            <h2>Đăng nhập</h2>
+            <p>Chào mừng bạn quay trở lại!</p>
+        </div>
+
+        <form id="loginForm" asp-action="Login" method="post" class="account-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+            
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required />
+                <span class="text-danger" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <div class="password-input-group">
+                    <input type="password" class="form-control" id="password" name="password" required />
+                    <button type="button" class="password-toggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <span class="text-danger" id="passwordError"></span>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe" />
+                <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+            </div>
+
+            <div class="form-group" id="recaptchaContainer" style="display:none;">
+                <div class="g-recaptcha" data-sitekey="@ViewData["RecaptchaSiteKey"]"></div>
+                <span class="text-danger" id="recaptchaError"></span>
+            </div>
+
+            <button type="submit" class="btn-account btn-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Đăng nhập
+            </button>
+        </form>
+
+        <div class="social-login">
+            <div class="social-login-title">Hoặc đăng nhập bằng</div>
+            <div class="social-buttons">
+                <a href="/Account/ExternalLogin?provider=Google" class="social-btn btn-google">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </a>
+                <a href="/Account/ExternalLogin?provider=Facebook" class="social-btn btn-facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="account-links">
+            <a asp-action="ForgotPassword">
+                <i class="fas fa-key"></i>
+                Quên mật khẩu?
+            </a>
+            <span class="mx-2">|</span>
+            <a asp-action="Register">
+                <i class="fas fa-user-plus"></i>
+                Đăng ký tài khoản mới
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-pages.css">
+        <link rel="stylesheet" href="~/css/HomePage_Layout/styles.css">
+}
+
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="~/js/login.js"></script>
+}

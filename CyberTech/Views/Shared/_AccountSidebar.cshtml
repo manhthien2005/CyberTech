@@ -1,0 +1,8 @@
+<a href="@Url.Action("Addresses", "Account")" class="sidebar-item @(ViewContext.RouteData.Values["Action"].ToString() == "Addresses" ? "active" : "")">
+    <i class="fas fa-map-marker-alt"></i>
+    <span>Địa chỉ của tôi</span>
+</a>
+<a href="@Url.Action("Wishlist", "Account")" class="sidebar-item @(ViewContext.RouteData.Values["Action"].ToString() == "Wishlist" ? "active" : "")">
+    <i class="fas fa-heart"></i>
+    <span>Sản phẩm yêu thích</span>
+</a> 

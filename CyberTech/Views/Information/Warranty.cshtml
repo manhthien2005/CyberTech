@@ -1,0 +1,149 @@
+@{
+    ViewBag.Title = "Chính sách bảo hành - CybotEcom";
+}
+
+<div class="warranty-page">
+    <div class="container">
+        <h1 class="page-title">Chính sách bảo hành</h1>
+
+        <div class="warranty-content">
+            <div class="section">
+                <h2>1. Thời gian bảo hành</h2>
+                <ul>
+                    <li>Laptop: 12 tháng</li>
+                    <li>PC Gaming: 24 tháng</li>
+                    <li>Màn hình: 24 tháng</li>
+                    <li>Phụ kiện: 12 tháng</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>2. Điều kiện bảo hành</h2>
+                <ul>
+                    <li>Sản phẩm còn trong thời hạn bảo hành</li>
+                    <li>Còn tem bảo hành nguyên vẹn</li>
+                    <li>Không có dấu hiệu can thiệp sửa chữa</li>
+                    <li>Không bị hư hỏng do lỗi người dùng</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>3. Quy trình bảo hành</h2>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Tiếp nhận</h3>
+                        <p>Kiểm tra và xác nhận tình trạng sản phẩm</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Chẩn đoán</h3>
+                        <p>Kiểm tra và xác định nguyên nhân lỗi</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Sửa chữa</h3>
+                        <p>Thực hiện sửa chữa hoặc thay thế linh kiện</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Hoàn trả</h3>
+                        <p>Kiểm tra và bàn giao sản phẩm cho khách hàng</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>4. Thời gian xử lý</h2>
+                <ul>
+                    <li>Sửa chữa tại chỗ: 1-2 ngày làm việc</li>
+                    <li>Sửa chữa tại trung tâm: 3-5 ngày làm việc</li>
+                    <li>Gửi hãng bảo hành: 7-14 ngày làm việc</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>5. Lưu ý quan trọng</h2>
+                <ul>
+                    <li>Sao lưu dữ liệu trước khi bảo hành</li>
+                    <li>Mang đầy đủ phụ kiện đi kèm</li>
+                    <li>Giữ lại hóa đơn mua hàng</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .warranty-page {
+            padding: 40px 0;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        ul li:before {
+            content: "•";
+            color: #007bff;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+} 

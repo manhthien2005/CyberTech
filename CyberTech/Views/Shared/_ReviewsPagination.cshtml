@@ -1,0 +1,60 @@
+@{
+    var model = ViewData.Model as dynamic;
+    var currentPage = model.CurrentPage;
+    var totalPages = model.TotalPages;
+    var productId = model.ProductId;
+}
+
+@if (totalPages > 1)
+{
+    <div class="reviews-pagination">
+        <div class="pagination-controls">
+            @if (currentPage > 1)
+            {
+                <button class="pagination-btn pagination-prev" data-page="@(currentPage - 1)" data-product-id="@productId">
+                    <i class="fas fa-chevron-left"></i> Trước
+                </button>
+            }
+
+            @{
+                var startPage = Math.Max(1, currentPage - 2);
+                var endPage = Math.Min(totalPages, currentPage + 2);
+            }
+
+            @if (startPage > 1)
+            {
+                <button class="pagination-btn pagination-number" data-page="1" data-product-id="@productId">1</button>
+                @if (startPage > 2)
+                {
+                    <span class="pagination-dots">...</span>
+                }
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <button class="pagination-btn pagination-number @(i == currentPage ? "active" : "")" 
+                        data-page="@i" data-product-id="@productId">@i</button>
+            }
+
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <span class="pagination-dots">...</span>
+                }
+                <button class="pagination-btn pagination-number" data-page="@totalPages" data-product-id="@productId">@totalPages</button>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <button class="pagination-btn pagination-next" data-page="@(currentPage + 1)" data-product-id="@productId">
+                    Sau <i class="fas fa-chevron-right"></i>
+                </button>
+            }
+        </div>
+        
+        <div class="pagination-info">
+            Trang @currentPage / @totalPages
+        </div>
+    </div>
+} 

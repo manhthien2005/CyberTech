@@ -1,0 +1,820 @@
+@model CyberTech.Models.User
+@{
+    ViewData["Title"] = "Thông tin tài khoản";
+}
+
+<div class="account-dashboard">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            @Html.Partial("_AccountSidebar")
+        </div>
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="account-content-main">
+                <!-- Rank Progress Section -->
+                <div class="rank-progress">
+                    <div class="rank-info">
+                        <div class="rank-current">
+                            <img src="@GetRankBadgeUrl(ViewBag.UserRank)" alt="@ViewBag.UserRank" class="rank-badge">
+                            <div>
+                                <h3 class="rank-name">@ViewBag.UserRank</h3>
+                                @if (Model.Rank?.DiscountPercent > 0)
+                                {
+                                    <span class="rank-discount">Giảm giá @Model.Rank.DiscountPercent%</span>
+                                }
+                            </div>
+                        </div>
+                        @if (!ViewBag.IsMaxRank && ViewBag.NextRank != null)
+                        {
+                            <div class="next-rank">
+                                <img src="@GetRankBadgeUrl(ViewBag.NextRank.RankName)" alt="@ViewBag.NextRank.RankName" class="rank-badge">
+                                <div>
+                                    <span>Rank tiếp theo: @ViewBag.NextRank.RankName</span>
+                                    @if (ViewBag.NextRank.DiscountPercent > 0)
+                                    {
+                                        <span class="rank-discount">Giảm giá @ViewBag.NextRank.DiscountPercent%</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (ViewBag.IsMaxRank)
+                        {
+                            <div class="max-rank-info">
+                                <span class="max-rank-badge">
+                                    <img src="/ranks/challenger.png" alt="Max Rank" class="max-rank-badge-img">
+                                    @ViewBag.MaxRankMessage
+                                </span>
+                                <div class="total-spent-info">
+                                    Tổng chi tiêu: @Model.TotalSpent.ToString("N0")đ
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (!ViewBag.IsMaxRank && ViewBag.NextRank != null)
+                    {
+                        var progress = (Model.TotalSpent / ViewBag.NextRank.MinTotalSpent) * 100;
+                        <div class="progress">
+                            <div class="progress-bar" style="width: @(Math.Min(progress, 100))%"></div>
+                        </div>
+                        <div class="rank-stats">
+                            <span>Đã chi tiêu: @Model.TotalSpent.ToString("N0")đ</span>
+                            <span>Cần thêm: @((ViewBag.NextRank.MinTotalSpent - Model.TotalSpent).ToString("N0"))đ</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img src="@(Model.ProfileImageURL ?? "/images/default-avatar.png")" alt="@Model.Name" id="profileImage">
+                            <div class="avatar-overlay">
+                                <label for="imageUpload" class="upload-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h2>@Model.Name</h2>
+                            <p class="text-muted">@Model.Email</p>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">@Model.OrderCount</span>
+                                    <span class="stat-label">Đơn hàng</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">@Model.TotalSpent.ToString("N0")đ</span>
+                                    <span class="stat-label">Đã chi tiêu</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    <span class="stat-label">Ngày tham gia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-content">
+                        <form id="profileForm" asp-action="UpdateProfile" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Họ và tên</label>
+                                        <input type="text" class="form-control" id="name" name="name" value="@Model.Name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone">Số điện thoại</label>
+                                        <input type="text" class="form-control" id="phone" name="phone" value="@Model.Phone">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email verification status -->
+                            <div class="email-verification-section">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="verification-status @(Model.EmailVerified ? "verified" : "not-verified")">
+                                            <div class="verification-icon">
+                                                @if (Model.EmailVerified)
+                                                {
+                                                    <i class="fas fa-check-circle"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                }
+                                            </div>
+                                            <div class="verification-info">
+                                                <h5>Trạng thái xác minh email</h5>
+                                                <p>@Model.Email</p>
+                                                @if (Model.EmailVerified)
+                                                {
+                                                    <span class="badge bg-success">Đã xác minh</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Chưa xác minh</span>
+                                                }
+                                            </div>
+                                            @if (!Model.EmailVerified)
+                                            {
+                                                <div class="verification-action">
+                                                    <button type="button" id="resendVerificationBtn" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-paper-plane me-1"></i> Gửi lại email xác minh
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Giới tính</label>
+                                        <div class="gender-options">
+                                            <script>
+                                                console.log("Gender: @Model.Phone"); // Note: This logs phone, not gender; consider fixing to log @Model.Gender
+                                            </script>
+                                            <label class="gender-option">
+                                                <input type="radio" name="gender" value="1" @(Model.Gender == 1 ? "checked" : "")>
+                                                <span class="gender-label">Nam</span>
+                                            </label>
+                                            <label class="gender-option">
+                                                <input type="radio" name="gender" value="2" @(Model.Gender == 2 ? "checked" : "")>
+                                                <span class="gender-label">Nữ</span>
+                                            </label>
+                                            <label class="gender-option">
+                                                <input type="radio" name="gender" value="0" @(Model.Gender == null ? "checked" : "")>
+                                                <span class="gender-label">Không xác định</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="dateOfBirth">Ngày sinh</label>
+                                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" 
+                                               value="@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("yyyy-MM-dd") : "")"
+                                               max="@DateTime.Now.AddYears(-18).ToString("yyyy-MM-dd")"
+                                               min="@DateTime.Now.AddYears(-100).ToString("yyyy-MM-dd")">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Change Password Section -->
+                        @if (Model.AuthMethods.Any(am => am.AuthType == "Password"))
+                        {
+                            <div class="change-password-section">
+                                <h4>Đổi mật khẩu</h4>
+                                <form id="changePasswordForm">
+                                    @Html.AntiForgeryToken()
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="currentPassword">Mật khẩu hiện tại</label>
+                                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="newPassword">Mật khẩu mới</label>
+                                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="confirmPassword">Xác nhận mật khẩu</label>
+                                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-outline-primary">
+                                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="change-password-section">
+                                <h4>Đổi mật khẩu</h4>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Tài khoản của bạn được đăng nhập thông qua @Model.AuthMethods.FirstOrDefault()?.AuthType. 
+                                    Bạn không thể thay đổi mật khẩu trực tiếp từ đây.
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    // Helper method to map rank names to badge image URLs
+    string GetRankBadgeUrl(string rankName)
+    {
+        var rankBadges = new Dictionary<string, string>
+        {
+            { "Đồng", "/ranks/bronze.png" },
+            { "Bạc", "/ranks/silver.png" },
+            { "Vàng", "/ranks/gold.png" },
+            { "Bạch Kim", "/ranks/platinum.png" },
+            { "Kim Cương", "/ranks/diamond.png" }
+        };
+
+        return rankBadges.TryGetValue(rankName, out var url) ? url : "/ranks/default.png";
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-dashboard.css">
+    <style>
+        .profile-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .profile-avatar {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #e9ecef;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .upload-btn {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .profile-info h2 {
+            margin: 0 0 5px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .profile-info p {
+            margin: 0 0 15px;
+            color: #6c757d;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 20px;
+            font-weight: 600;
+            color: #0077cc;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .profile-content {
+            margin-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #0077cc;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .gender-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .gender-label {
+            color: #495057;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #0077cc;
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid #0077cc;
+            color: #0077cc;
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: #0077cc;
+            color: white;
+        }
+
+        .change-password-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .change-password-section h4 {
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Rank Progress Styles */
+        .rank-progress {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .rank-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .rank-current, .next-rank {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank-badge {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .rank-badge:hover {
+            transform: scale(1.1);
+        }
+
+        .rank-name {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .rank-discount {
+            display: block;
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: #0077cc;
+            transition: width 0.5s ease;
+        }
+
+        .rank-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Max Rank Styles */
+        .max-rank-info {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffcc00 100%);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .max-rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            color: #8B4513;
+            font-weight: 600;
+        }
+
+        .max-rank-badge-img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            animation: sparkle 2s infinite;
+        }
+
+        .total-spent-info {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #8B4513;
+            font-weight: 500;
+        }
+
+        /* Sparkle animation for max rank badge */
+        @@keyframes sparkle {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @@media (max-width: 768px) {
+            .rank-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .rank-current, .next-rank {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .rank-badge {
+                width: 50px;
+                height: 50px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .gender-options {
+                justify-content: center;
+            }
+        }
+
+        /* Email verification styles */
+        .email-verification-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .verification-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .verification-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .verification-info {
+            flex-grow: 1;
+        }
+
+        .verification-action {
+            margin-left: auto;
+            padding-left: 15px;
+        }
+
+        .verified .verification-icon {
+            color: #28a745;
+        }
+
+        .not-verified .verification-icon {
+            color: #ffc107;
+        }
+
+        .verification-info h5 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .verification-info p {
+            margin: 0 0 5px 0;
+            color: #6c757d;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(function() {
+            // Handle profile image upload
+            $('#imageUpload').on('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var formData = new FormData();
+                    formData.append('image', file);
+
+                    $.ajax({
+                        url: '/Account/UpdateProfileImage',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                $('#profileImage').attr('src', response.imageUrl);
+                                utils.showToast('Cập nhật ảnh đại diện thành công', 'success');
+                            } else {
+                                utils.showToast(response.message || 'Không thể cập nhật ảnh đại diện', 'error');
+                            }
+                        },
+                        error: function() {
+                            utils.showToast('Có lỗi xảy ra khi cập nhật ảnh đại diện', 'error');
+                        }
+                    });
+                }
+            });
+
+            // Handle profile update
+            $('#profileForm').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                
+                // Validate form
+                var name = $('#name').val();
+                if (!name) {
+                    utils.showToast('Vui lòng nhập họ tên', 'error');
+                    return;
+                }
+
+                var phone = $('#phone').val();
+                if (phone && !/^[0-9]{10}$/.test(phone)) {
+                    utils.showToast('Số điện thoại không hợp lệ', 'error');
+                    return;
+                }
+
+                var dateOfBirth = $('#dateOfBirth').val();
+                if (dateOfBirth) {
+                    var dob = new Date(dateOfBirth);
+                    var today = new Date();
+                    var age = today.getFullYear() - dob.getFullYear();
+                    if (age < 18 || age > 100) {
+                        utils.showToast('Tuổi phải từ 18 đến 100', 'error');
+                        return;
+                    }
+                }
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            utils.showToast(response.message || 'Cập nhật thông tin thành công', 'success');
+                            // Reload page after 1 second to show updated info
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    },
+                    error: function() {
+                        utils.showToast('Có lỗi xảy ra khi cập nhật thông tin', 'error');
+                    }
+                });
+            });
+
+            // Handle password change
+            $('#changePasswordForm').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var newPassword = $('#newPassword').val();
+                var confirmPassword = $('#confirmPassword').val();
+
+                if (newPassword !== confirmPassword) {
+                    utils.showToast('Mật khẩu xác nhận không khớp', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Account/ChangePassword',
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            utils.showToast('Đổi mật khẩu thành công', 'success');
+                            form[0].reset();
+                        } else {
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    },
+                    error: function() {
+                        utils.showToast('Có lỗi xảy ra khi đổi mật khẩu', 'error');
+                    }
+                });
+            });
+
+            // Phone number validation
+            $('#phone').on('input', function() {
+                var phone = $(this).val();
+                var phoneRegex = /^[0-9]{10}$/;
+                if (phone && !phoneRegex.test(phone)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Date of birth validation
+            $('#dateOfBirth').on('change', function() {
+                var dob = new Date($(this).val());
+                var today = new Date();
+                var age = today.getFullYear() - dob.getFullYear();
+                
+                if (age < 18 || age > 100) {
+                    $(this).addClass('is-invalid');
+                    utils.showToast('Tuổi phải từ 18 đến 100', 'error');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Handle email verification resend
+            $('#resendVerificationBtn').on('click', function() {
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Đang gửi...');
+                
+                $.ajax({
+                    url: '/Account/ResendVerificationEmail',
+                    type: 'POST',
+                    data: {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            utils.showToast(response.message, 'success');
+                        } else {
+                            utils.showToast(response.message || 'Có lỗi xảy ra', 'error');
+                        }
+                        $('#resendVerificationBtn').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Gửi lại email xác minh');
+                    },
+                    error: function() {
+                        utils.showToast('Có lỗi xảy ra khi gửi lại email xác minh', 'error');
+                        $('#resendVerificationBtn').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Gửi lại email xác minh');
+                    }
+                });
+            });
+        });
+    </script>
+}

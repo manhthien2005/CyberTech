@@ -1,0 +1,271 @@
+@{
+    ViewBag.Title = "Tin tức công nghệ - CybotEcom";
+}
+
+<div class="news-page">
+    <div class="container">
+        <h1 class="page-title">Tin tức công nghệ</h1>
+
+        <div class="news-categories">
+            <button class="category-btn active">Tất cả</button>
+            <button class="category-btn">Laptop</button>
+            <button class="category-btn">PC Gaming</button>
+            <button class="category-btn">Phụ kiện</button>
+            <button class="category-btn">Công nghệ</button>
+        </div>
+
+        <div class="news-grid">
+            <div class="news-card featured">
+                <div class="news-image">
+                    <img src="~/images/news/featured.jpg" alt="Tin tức nổi bật">
+                    <span class="news-tag">Nổi bật</span>
+                </div>
+                <div class="news-content">
+                    <h2>Intel ra mắt CPU thế hệ mới với hiệu năng vượt trội</h2>
+                    <p class="news-excerpt">Intel vừa chính thức ra mắt dòng CPU thế hệ mới với nhiều cải tiến về hiệu năng và tiết kiệm điện năng...</p>
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> 20/03/2024</span>
+                        <span><i class="far fa-eye"></i> 1.2K lượt xem</span>
+                    </div>
+                    <a href="#" class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">
+                    <img src="~/images/news/news1.jpg" alt="Tin tức 1">
+                    <span class="news-tag">Laptop</span>
+                </div>
+                <div class="news-content">
+                    <h3>Top 5 laptop gaming đáng mua nhất 2024</h3>
+                    <p class="news-excerpt">Tổng hợp những mẫu laptop gaming tốt nhất với hiệu năng mạnh mẽ và giá cả phải chăng...</p>
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> 19/03/2024</span>
+                        <span><i class="far fa-eye"></i> 856 lượt xem</span>
+                    </div>
+                    <a href="#" class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">
+                    <img src="~/images/news/news2.jpg" alt="Tin tức 2">
+                    <span class="news-tag">PC Gaming</span>
+                </div>
+                <div class="news-content">
+                    <h3>Hướng dẫn build PC gaming tầm trung 2024</h3>
+                    <p class="news-excerpt">Cấu hình PC gaming tối ưu với ngân sách 20 triệu đồng, phù hợp cho game thủ...</p>
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> 18/03/2024</span>
+                        <span><i class="far fa-eye"></i> 1.5K lượt xem</span>
+                    </div>
+                    <a href="#" class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="news-card">
+                <div class="news-image">
+                    <img src="~/images/news/news3.jpg" alt="Tin tức 3">
+                    <span class="news-tag">Phụ kiện</span>
+                </div>
+                <div class="news-content">
+                    <h3>Review bàn phím cơ tốt nhất cho game thủ</h3>
+                    <p class="news-excerpt">So sánh chi tiết các mẫu bàn phím cơ gaming phổ biến trên thị trường...</p>
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> 17/03/2024</span>
+                        <span><i class="far fa-eye"></i> 723 lượt xem</span>
+                    </div>
+                    <a href="#" class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <a href="#" class="active">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#" class="next">Tiếp <i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .news-page {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .news-categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .news-card.featured {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+        }
+
+        .news-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .news-card.featured .news-image {
+            height: 100%;
+        }
+
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .news-card:hover .news-image img {
+            transform: scale(1.1);
+        }
+
+        .news-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .news-content {
+            padding: 20px;
+        }
+
+        .news-card.featured .news-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .news-content h2,
+        .news-content h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .news-excerpt {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 20px;
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .news-meta i {
+            margin-right: 5px;
+        }
+
+        .read-more {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .read-more:hover {
+            color: #0056b3;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .pagination a {
+            padding: 8px 15px;
+            border-radius: 5px;
+            background: white;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .pagination a.active,
+        .pagination a:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .pagination .next {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @@media (max-width: 768px) {
+            .news-card.featured {
+                grid-template-columns: 1fr;
+            }
+
+            .news-card.featured .news-image {
+                height: 200px;
+            }
+        }
+    </style>
+} 

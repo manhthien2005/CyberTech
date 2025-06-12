@@ -1,0 +1,346 @@
+@{
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+    var title = ViewBag.Title ?? "CyberTech Admin";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/employee-management.css">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-suspended {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .auth-method-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .auth-password {
+            background-color: #0d6efd;
+        }
+
+        .auth-google {
+            background-color: #db4437;
+        }
+
+        .auth-facebook {
+            background-color: #3b5998;
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Quản lý nhân viên</h1>
+    <p>Quản lý thông tin nhân viên và trạng thái tài khoản</p>
+</div>
+
+<!-- Employee Management Content -->
+<div class="employee-management-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" id="addEmployeeBtn" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+            <i class="fas fa-plus me-2"></i> Thêm nhân viên
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="employeeSearchInput"
+                    placeholder="Tìm kiếm nhân viên theo tên, email, số điện thoại...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="sortFilter">
+                <option value="date_desc">Mới nhất</option>
+                <option value="date_asc">Cũ nhất</option>
+                <option value="name_asc">Tên: A-Z</option>
+                <option value="name_desc">Tên: Z-A</option>
+                <option value="email_asc">Email: A-Z</option>
+                <option value="email_desc">Email: Z-A</option>
+                <option value="role_asc">Vai trò: A-Z</option>
+                <option value="role_desc">Vai trò: Z-A</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="Active">Đang hoạt động</option>
+                <option value="Inactive">Không hoạt động</option>
+                <option value="Suspended">Tạm khóa</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="employee-content-container">
+        <div class="employee-table-container">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nhân viên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                            <th>Vai trò</th>
+                            <th>Lương</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTableBody">
+                        <!-- Employee data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <nav aria-label="Employee pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="employeePagination">
+                <li class="page-item disabled" id="paginationPrev">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <div id="paginationItems" class="d-flex">
+                </div>
+                <li class="page-item" id="paginationNext">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEmployeeModalLabel">Thêm nhân viên mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                        <select class="form-select" id="role" required>
+                            <option value="Support">Hỗ trợ</option>
+                            <option value="Manager">Quản lý</option>
+                            <option value="SuperAdmin">Quản trị viên cấp cao</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="salary" class="form-label">Lương</label>
+                        <input type="number" class="form-control" id="salary" step="0.01">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveEmployeeBtn">Thêm nhân viên</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmployeeModalLabel">Chỉnh sửa thông tin nhân viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEmployeeForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editName" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editUsername" class="form-label">Tên đăng nhập</label>
+                                <input type="text" class="form-control" id="editUsername" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editPhone" class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" id="editPhone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editStatus" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="editStatus">
+                                    <option value="Active">Đang hoạt động</option>
+                                    <option value="Inactive">Không hoạt động</option>
+                                    <option value="Suspended">Tạm khóa</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Giới tính</label>
+                                <div class="gender-radio-group">
+                                    <div class="gender-radio">
+                                        <input type="radio" id="male" name="gender" value="1">
+                                        <label for="male">Nam</label>
+                                    </div>
+                                    <div class="gender-radio">
+                                        <input type="radio" id="female" name="gender" value="2">
+                                        <label for="female">Nữ</label>
+                                    </div>
+                                    <div class="gender-radio">
+                                        <input type="radio" id="other" name="gender" value="">
+                                        <label for="other">Không xác định</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editDateOfBirth" class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" id="editDateOfBirth">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editRole" class="form-label">Vai trò</label>
+                                <select class="form-select" id="editRole">
+                                    <option value="Support">Hỗ trợ</option>
+                                    <option value="Manager">Quản lý</option>
+                                    <option value="SuperAdmin">Quản trị viên cấp cao</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editSalary" class="form-label">Lương</label>
+                                <input type="number" class="form-control" id="editSalary" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Ngày tham gia</label>
+                                <div id="employeeJoinDate"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phương thức đăng nhập</label>
+                                <div id="authMethodsList" class="mt-1">
+                                    <p class="text-center text-muted">Chưa có phương thức đăng nhập nào</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="updateEmployeeBtn">Cập nhật thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Employee Modal -->
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEmployeeModalLabel">Thay đổi trạng thái tài khoản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn vô hiệu hóa tài khoản của nhân viên <span id="deleteEmployeeName" class="fw-bold"></span>?</p>
+                <p class="text-danger">Tài khoản sẽ bị chuyển sang trạng thái không hoạt động và nhân viên sẽ không thể đăng nhập.</p>
+                <input type="hidden" id="deleteEmployeeId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteEmployeeBtn">Vô hiệu hóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/employee-management.js"></script>
+}

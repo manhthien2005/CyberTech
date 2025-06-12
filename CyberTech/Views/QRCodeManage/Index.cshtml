@@ -1,0 +1,175 @@
+@{
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+    var title = ViewBag.Title ?? "Happy Kitchen";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/qr-management.css">
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Quản lý mã QR</h1>
+    <p>Quản lý mã QR để khách hàng quét và truy cập menu</p>
+</div>
+
+<!-- QR Management Content -->
+<div class="qr-management-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" id="addQRBtn" data-bs-toggle="modal" data-bs-target="#addQRModal">
+            <i class="fas fa-plus me-2"></i> Thêm mã QR
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="qrSearchInput"
+                    placeholder="Tìm kiếm mã QR...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="btn-group" role="group" id="statusFilter">
+                <button type="button" class="btn btn-outline-primary active" data-status="all">Tất cả</button>
+                <button type="button" class="btn btn-outline-primary" data-status="1">Hoạt động</button>
+                <button type="button" class="btn btn-outline-primary" data-status="0">Không hoạt động</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="sortFilter">
+                <option value="table_asc">Bàn: Thấp-Cao</option>
+                <option value="table_desc">Bàn: Cao-Thấp</option>
+                <option value="access_asc">Lượt truy cập: Thấp-Cao</option>
+                <option value="access_desc">Lượt truy cập: Cao-Thấp</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="qr-content-container">
+        <div class="qr-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="qrGrid"></div>
+        </div>
+
+        <nav aria-label="QR Code pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="qrPagination">
+                <li class="page-item disabled" id="paginationPrev">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <div id="paginationItems" class="d-flex">
+                </div>
+                <li class="page-item" id="paginationNext">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Add QR Modal -->
+<div class="modal fade" id="addQRModal" tabindex="-1" aria-labelledby="addQRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQRModalLabel">Thêm mã QR mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Tạo mã QR mới cho bàn để khách hàng quét.</p>
+                <form id="addQRForm">
+                    <div class="mb-3">
+                        <label for="qrTable" class="form-label">Bàn <span class="text-danger">*</span></label>
+                        <select class="form-select" id="qrTable" required>
+                            <option value="" selected disabled>Chọn bàn</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveQRBtn">Thêm mã QR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit QR Modal -->
+<div class="modal fade" id="editQRModal" tabindex="-1" aria-labelledby="editQRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editQRModalLabel">Chỉnh sửa mã QR</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editQRForm">
+                    <input type="hidden" id="editQRId">
+                    <div class="mb-3">
+                        <label for="editQRTable" class="form-label">Bàn <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editQRTable" required>
+                            <option value="" selected disabled>Chọn bàn</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editQRStatus" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select class="form-select" id="editQRStatus" required>
+                            <option value="0">Hoạt động</option>
+                            <option value="1">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="updateQRBtn">Cập nhật mã QR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete QR Modal -->
+<div class="modal fade" id="deleteQRModal" tabindex="-1" aria-labelledby="deleteQRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteQRModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa mã QR cho bàn <span id="deleteQRTable" class="fw-bold"></span>?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác.</p>
+                <input type="hidden" id="deleteQRId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteQRBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Zoom QR Modal -->
+<div class="modal fade" id="zoomQRModal" tabindex="-1" aria-labelledby="zoomQRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="zoomQRModalLabel">Xem mã QR</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="zoomQRImage" src="" alt="Zoomed QR Code" class="img-fluid" style="max-width: 100%;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/admin/js/qr-management.js"></script>
+}

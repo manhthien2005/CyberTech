@@ -1,0 +1,81 @@
+.order-timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 1;
+}
+
+.timeline-item {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    flex: 1;
+}
+
+.timeline-point {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    position: relative;
+}
+
+.timeline-item.active .timeline-point {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.timeline-content {
+    padding: 0 10px;
+}
+
+.timeline-content h4 {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #666;
+}
+
+.timeline-item.active .timeline-content h4 {
+    color: #28a745;
+}
+
+.timeline-content p {
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+}
+
+.order-item-image {
+    border-radius: 4px;
+}
+
+.order-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.status-pending { color: #ffc107; }
+.status-processing { color: #17a2b8; }
+.status-shipped { color: #007bff; }
+.status-delivered { color: #28a745; }
+.status-cancelled { color: #dc3545; } 

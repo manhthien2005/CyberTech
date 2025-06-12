@@ -1,0 +1,105 @@
+@model List<CyberTech.Services.ChatLogEntry>
+@{
+    ViewData["Title"] = "User Chat Logs";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var userIdentifier = Model.FirstOrDefault()?.UserIdentifier ?? "Unknown";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-comments me-2"></i>Chat Logs for @userIdentifier
+        </h2>
+        <a href="@Url.Action("ListChatLogs", "Chat")" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Log Files
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Conversation History
+                </h5>
+                <span class="badge bg-light text-dark">@Model.Count entries</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Any())
+            {
+                <div class="chat-log-container">
+                    @foreach (var entry in Model.OrderBy(e => e.Timestamp))
+                    {
+                        <div class="chat-entry p-3 border-bottom">
+                            <div class="chat-timestamp text-muted small mb-2">
+                                <i class="fas fa-clock me-1"></i>@entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                            </div>
+                            
+                            <div class="chat-message user-message mb-3">
+                                <div class="chat-message-header">
+                                    <strong><i class="fas fa-user me-1"></i>User</strong>
+                                </div>
+                                <div class="chat-message-content p-2 bg-light rounded">
+                                    @entry.UserInput
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message bot-message">
+                                <div class="chat-message-header">
+                                    <strong><i class="fas fa-robot me-1"></i>Bot</strong>
+                                </div>
+                                <div class="chat-message-content p-2 bg-info bg-opacity-10 rounded">
+                                    @entry.BotResponse
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info m-3">
+                    <i class="fas fa-info-circle me-2"></i>No chat logs found for this user.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .chat-log-container {
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .chat-message-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .user-message .chat-message-content {
+            background-color: #f8f9fa;
+        }
+        
+        .bot-message .chat-message-content {
+            background-color: #e3f2fd;
+        }
+        
+        .chat-entry:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Scroll to bottom of chat log container on load
+            var container = document.querySelector('.chat-log-container');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    </script>
+} 

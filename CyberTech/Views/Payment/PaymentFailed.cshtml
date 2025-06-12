@@ -1,0 +1,158 @@
+@{
+    ViewData["Title"] = "Thanh toán thất bại";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center" style="margin: 0 auto;">
+        <div class="col-md-8">
+            <div class="payment-card">
+                <div class="payment-result-icon failed">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="payment-content">
+                    <h2>Thanh toán thất bại</h2>
+                    <div class="payment-details">
+                        Rất tiếc, quá trình thanh toán của bạn không thành công.
+                        @if (ViewBag.OrderId != null)
+                        {
+                            <div class="order-id">
+                                Mã đơn hàng: <strong>#@ViewBag.OrderId</strong>
+                            </div>
+                        }
+                        <div class="support-message">
+                            Vui lòng thử lại hoặc liên hệ với chúng tôi để được hỗ trợ.
+                        </div>
+                    </div>
+                    <div class="payment-actions">
+                        <a href="@Url.Action("Index", "Cart")" class="action-button primary">
+                            <i class="fas fa-shopping-cart"></i>Quay lại giỏ hàng
+                        </a>
+                        <a href="@Url.Action("Contact", "Home")" class="action-button secondary">
+                            <i class="fas fa-headset"></i>Liên hệ hỗ trợ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .payment-card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .payment-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .payment-result-icon {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-result-icon i {
+            font-size: 5.5rem;
+            border-radius: 50%;
+            padding: 0.5rem;
+        }
+        
+        .payment-result-icon.failed i {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .payment-content {
+            text-align: center;
+        }
+        
+        .payment-content h2 {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .payment-details {
+            color: #6c757d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .order-id {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .support-message {
+            margin-top: 0.8rem;
+        }
+        
+        .payment-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-button.primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .action-button.primary:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+        
+        .action-button.secondary {
+            background-color: white;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+        }
+        
+        .action-button.secondary:hover {
+            background-color: #f8f9fa;
+            color: #0b5ed7;
+        }
+        
+        @@media (max-width: 768px) {
+            .payment-actions {
+                flex-direction: column;
+            }
+            
+            .action-button {
+                width: 100%;
+            }
+        }
+    </style>
+} 

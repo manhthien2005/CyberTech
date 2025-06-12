@@ -1,0 +1,209 @@
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+    Layout = "_Layout";
+}
+
+<div class="access-denied-container">
+    <div class="access-denied-card">
+        <div class="access-denied-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <div class="access-denied-content">
+            <h1>403</h1>
+            <h2>Truy cập bị từ chối</h2>
+            <p>Xin lỗi, bạn không có quyền truy cập vào trang này.</p>
+            
+            <div class="alert-box">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <strong>Lưu ý:</strong>
+                    <ul>
+                        <li>Kiểm tra lại quyền truy cập của bạn</li>
+                        <li>Liên hệ với quản trị viên nếu cần hỗ trợ</li>
+                        <li>Đăng nhập lại với tài khoản có quyền truy cập</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/" class="btn-home">
+                    <i class="fas fa-home"></i>
+                    Trang chủ
+                </a>
+                <a href="/Account/Login" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Đăng nhập
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .access-denied-container {
+            width: 1200px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .access-denied-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .access-denied-icon {
+            font-size: 50px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .access-denied-content h1 {
+            font-size: 72px;
+            color: #dc3545;
+            margin: 0;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .access-denied-content h2 {
+            font-size: 24px;
+            color: #343a40;
+            margin: 10px 0;
+        }
+
+        .access-denied-content p {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .alert-icon {
+            color: #856404;
+            font-size: 24px;
+            margin-right: 15px;
+            margin-top: 3px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-content strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .alert-content ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+
+        .alert-content li {
+            margin: 5px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-home, .btn-login {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-home {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-login {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+
+        .btn-home:hover, .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-home:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-login:hover {
+            background-color: #218838;
+        }
+
+        @@media (max-width: 576px) {
+            .access-denied-card {
+                padding: 20px;
+            }
+
+            .access-denied-content h1 {
+                font-size: 48px;
+            }
+
+            .access-denied-content h2 {
+                font-size: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-home, .btn-login {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+} 

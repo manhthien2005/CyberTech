@@ -1,0 +1,57 @@
+@{ var currentAction = ViewContext.RouteData.Values["action"].ToString(); }
+
+<div class="account-sidebar">
+    <div class="user-info">
+        <div class="user-avatar">
+            <img src="@(string.IsNullOrEmpty(ViewBag.UserProfileImage) ? "/images/default-avatar.png" : ViewBag.UserProfileImage)" alt="Avatar">
+        </div>
+        <div class="user-details">
+            <h4>@User.Identity.Name</h4>
+            <span class="user-rank">@ViewBag.UserRank</span>
+        </div>
+    </div>
+    <nav class="account-nav">
+        <ul>
+            <li class="@(currentAction == "Profile" ? "active" : "")">
+                <a href="@Url.Action("Profile", "Account")">
+                    <i class="fas fa-user"></i>
+                    <span>Thông tin cá nhân</span>
+                </a>
+            </li>
+            <li class="@(currentAction == "Orders" ? "active" : "")">
+                <a href="@Url.Action("Orders", "Account")">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Đơn hàng của tôi</span>
+                </a>
+            </li>
+            <li class="@(currentAction == "Wishlist" ? "active" : "")">
+                <a href="@Url.Action("Wishlist", "Account")">
+                    <i class="fas fa-heart"></i>
+                    <span>Sản phẩm yêu thích</span>
+                </a>
+            </li>
+            <li class="@(currentAction == "Addresses" ? "active" : "")">
+                <a href="@Url.Action("Addresses", "Account")">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Sổ địa chỉ</span>
+                </a>
+            </li>
+            <li class="@(currentAction == "Vouchers" ? "active" : "")">
+                <a href="@Url.Action("Vouchers", "Account")">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Kho voucher</span>
+                    @if (ViewBag.VoucherCount > 0)
+                    {
+                        <span class="badge bg-danger rounded-pill ms-2">@ViewBag.VoucherCount</span>
+                    }
+                </a>
+            </li>
+            <li>
+                 <a href="@Url.Action("Logout", "Account")">
+                     <i class="fas fa-sign-out-alt"></i>
+                     <span>Đăng xuất</span>
+                 </a>
+            </li>
+        </ul>
+    </nav>
+</div> 

@@ -1,0 +1,347 @@
+@{
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+    var title = ViewBag.Title ?? "Happy Kitchen";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/admin/css/voucher-management.css">
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Quản lý voucher</h1>
+    <p>Quản lý các mã giảm giá và ưu đãi cho khách hàng</p>
+</div>
+
+<!-- Voucher Management Content -->
+<div class="voucher-management-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-primary" id="addVoucherBtn" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
+            <i class="fas fa-plus me-2"></i> Thêm voucher
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="voucherSearchInput"
+                    placeholder="Tìm kiếm voucher...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="sortFilter">
+                <option value="validto_desc">Hết hạn: Gần nhất</option>
+                <option value="validto_asc">Hết hạn: Xa nhất</option>
+                <option value="code_asc">Mã: A-Z</option>
+                <option value="code_desc">Mã: Z-A</option>
+                <option value="value_asc">Giá trị: Thấp-Cao</option>
+                <option value="value_desc">Giá trị: Cao-Thấp</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-calendar-alt text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="dateRangeFilter"
+                    placeholder="Chọn khoảng thời gian...">
+            </div>
+        </div>
+    </div>
+
+    <div class="voucher-content-container">
+        <div class="voucher-grid">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="voucherGrid"></div>
+        </div>
+
+        <nav aria-label="Voucher pagination" class="mt-4">
+            <ul class="pagination justify-content-center" id="voucherPagination">
+                <li class="page-item disabled" id="paginationPrev">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <div id="paginationItems" class="d-flex">
+                </div>
+                <li class="page-item" id="paginationNext">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Add Voucher Modal -->
+<div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVoucherModalLabel">Thêm voucher mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addVoucherForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="voucherCode" class="form-label">Mã voucher <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="voucherCode" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="discountType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                                <select class="form-select" id="discountType" required>
+                                    <option value="PERCENT">Phần trăm (%)</option>
+                                    <option value="FIXED">Cố định (VND)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="discountValue" class="form-label">Giá trị giảm <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="discountValue" required min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantityAvailable" class="form-label">Số lượng có sẵn</label>
+                                <input type="number" class="form-control" id="quantityAvailable" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="validFrom" class="form-label">Có hiệu lực từ <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="validFrom" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="validTo" class="form-label">Hết hiệu lực vào <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="validTo" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="appliesTo" class="form-label">Áp dụng cho <span class="text-danger">*</span></label>
+                                <select class="form-select" id="appliesTo" required>
+                                    <option value="Order">Toàn bộ đơn hàng</option>
+                                    <option value="Product">Sản phẩm cụ thể</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="isSystemWide" class="form-label">Phạm vi áp dụng <span class="text-danger">*</span></label>
+                                <select class="form-select" id="isSystemWide" required>
+                                    <option value="true">Toàn hệ thống</option>
+                                    <option value="false">Người dùng cụ thể</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3 d-none" id="productSelectionContainer">
+                        <label for="productSearch" class="form-label">Tìm kiếm sản phẩm</label>
+                        <input type="text" class="form-control" id="productSearch" placeholder="Nhập tên sản phẩm...">
+                        <div id="productSuggestions" class="dropdown-menu w-100 mt-2" style="max-height: 200px; overflow-y: auto;"></div>
+                        <div id="selectedProducts" class="mt-2"></div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="isActive" checked>
+                        <label class="form-check-label" for="isActive">Kích hoạt</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveVoucherBtn">Thêm voucher</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Voucher Modal -->
+<div class="modal fade" id="editVoucherModal" tabindex="-1" aria-labelledby="editVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editVoucherModalLabel">Chỉnh sửa voucher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editVoucherForm">
+                    <input type="hidden" id="editVoucherId">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editVoucherCode" class="form-label">Mã voucher <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editVoucherCode" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editDiscountType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editDiscountType" required>
+                                    <option value="PERCENT">Phần trăm (%)</option>
+                                    <option value="FIXED">Cố định (VND)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editDiscountValue" class="form-label">Giá trị giảm <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editDiscountValue" required min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editQuantityAvailable" class="form-label">Số lượng có sẵn</label>
+                                <input type="number" class="form-control" id="editQuantityAvailable" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editValidFrom" class="form-label">Có hiệu lực từ <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editValidFrom" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editValidTo" class="form-label">Hết hiệu lực vào <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editValidTo" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editAppliesTo" class="form-label">Áp dụng cho <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editAppliesTo" required>
+                                    <option value="Order">Toàn bộ đơn hàng</option>
+                                    <option value="Product">Sản phẩm cụ thể</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editIsSystemWide" class="form-label">Phạm vi áp dụng <span class="text-danger">*</span></label>
+                                <select class="form-select" id="editIsSystemWide" required>
+                                    <option value="true">Toàn hệ thống</option>
+                                    <option value="false">Người dùng cụ thể</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3 d-none" id="editProductSelectionContainer">
+                        <label for="editProductSearch" class="form-label">Tìm kiếm sản phẩm</label>
+                        <input type="text" class="form-control" id="editProductSearch" placeholder="Nhập tên sản phẩm...">
+                        <div id="editProductSuggestions" class="dropdown-menu w-100 mt-2" style="max-height: 200px; overflow-y: auto;"></div>
+                        <div id="editSelectedProducts" class="mt-2"></div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editIsActive">
+                        <label class="form-check-label" for="editIsActive">Kích hoạt</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="updateVoucherBtn">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Voucher Modal -->
+<div class="modal fade" id="deleteVoucherModal" tabindex="-1" aria-labelledby="deleteVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteVoucherModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa voucher <span id="deleteVoucherCode" class="fw-bold"></span>?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác.</p>
+                <input type="hidden" id="deleteVoucherId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteVoucherBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Voucher Modal -->
+<div class="modal fade" id="sendVoucherModal" tabindex="-1" aria-labelledby="sendVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendVoucherModalLabel">Gửi voucher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="sendVoucherForm">
+                    <input type="hidden" id="sendVoucherId">
+                    <p>Gửi voucher <span id="sendVoucherCode" class="fw-bold"></span> đến:</p>
+                    <div class="mb-3">
+                        <label for="userSearch" class="form-label">Tìm kiếm người dùng</label>
+                        <input type="text" class="form-control" id="userSearch" placeholder="Nhập tên hoặc email...">
+                        <div id="userSuggestions" class="dropdown-menu w-100 mt-2" style="max-height: 200px; overflow-y: auto;"></div>
+                        <div id="selectedUser" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="sendToAllUsers">
+                        <label class="form-check-label" for="sendToAllUsers">Gửi đến tất cả người dùng</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmSendVoucherBtn">Gửi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
+    <script src="~/admin/js/voucher-management.js"></script>
+} 

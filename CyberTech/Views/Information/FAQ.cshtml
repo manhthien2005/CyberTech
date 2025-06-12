@@ -1,0 +1,913 @@
+@{
+    ViewBag.Title = "Câu hỏi thường gặp - CybotEcom";
+}
+
+<div class="faq-page">
+    <div class="container">
+        <h1 class="page-title">Câu hỏi thường gặp (FAQ)</h1>
+
+        <div class="faq-content">
+            <div class="search-box">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="faq-search" placeholder="Tìm kiếm câu hỏi...">
+                </div>
+            </div>
+
+            <div class="faq-categories">
+                <button class="category-btn active" data-category="all">Tất cả</button>
+                <button class="category-btn" data-category="order">Đặt hàng</button>
+                <button class="category-btn" data-category="shipping">Vận chuyển</button>
+                <button class="category-btn" data-category="payment">Thanh toán</button>
+                <button class="category-btn" data-category="warranty">Bảo hành</button>
+                <button class="category-btn" data-category="return">Đổi trả</button>
+                <button class="category-btn" data-category="account">Tài khoản</button>
+            </div>
+
+            <div class="faq-list">
+                <!-- Đặt hàng -->
+                <div class="faq-category" id="order">
+                    <h2>Đặt hàng</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để đặt hàng trên CybotEcom?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Bạn có thể đặt hàng trên CybotEcom theo các bước sau:</p>
+                            <ol>
+                                <li>Tìm kiếm sản phẩm bạn muốn mua</li>
+                                <li>Nhấn nút "Thêm vào giỏ hàng"</li>
+                                <li>Vào giỏ hàng và nhấn "Thanh toán"</li>
+                                <li>Điền thông tin giao hàng và phương thức thanh toán</li>
+                                <li>Xác nhận đơn hàng</li>
+                            </ol>
+                            <p>Sau khi đặt hàng, bạn sẽ nhận được email xác nhận đơn hàng.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi có thể hủy đơn hàng sau khi đã đặt không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Có, bạn có thể hủy đơn hàng trong các trường hợp sau:</p>
+                            <ul>
+                                <li>Đơn hàng chưa được xác nhận: Bạn có thể hủy trực tiếp trên website trong mục "Đơn hàng của tôi"</li>
+                                <li>Đơn hàng đã xác nhận nhưng chưa giao cho đơn vị vận chuyển: Vui lòng liên hệ hotline 0977 139 203 để được hỗ trợ hủy đơn</li>
+                            </ul>
+                            <p>Lưu ý: Đối với đơn hàng đã giao cho đơn vị vận chuyển, bạn sẽ không thể hủy đơn hàng.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi có thể thay đổi địa chỉ giao hàng sau khi đặt hàng không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Bạn có thể thay đổi địa chỉ giao hàng nếu đơn hàng chưa được giao cho đơn vị vận chuyển. Vui lòng liên hệ với chúng tôi qua hotline 0977 139 203 hoặc email support@cybotecom.com càng sớm càng tốt để được hỗ trợ.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi có cần tạo tài khoản để mua hàng không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Không, bạn có thể mua hàng mà không cần tạo tài khoản bằng cách chọn tùy chọn "Thanh toán không cần đăng nhập" trong quá trình thanh toán. Tuy nhiên, việc tạo tài khoản sẽ giúp bạn:</p>
+                            <ul>
+                                <li>Theo dõi đơn hàng dễ dàng</li>
+                                <li>Lưu địa chỉ giao hàng cho lần mua sau</li>
+                                <li>Nhận thông tin khuyến mãi</li>
+                                <li>Tích lũy điểm thưởng</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để kiểm tra tình trạng đơn hàng?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Bạn có thể kiểm tra tình trạng đơn hàng bằng một trong các cách sau:</p>
+                            <ul>
+                                <li>Đăng nhập vào tài khoản và vào mục "Đơn hàng của tôi"</li>
+                                <li>Sử dụng tính năng "Kiểm tra đơn hàng" trên trang chủ bằng cách nhập email và mã đơn hàng</li>
+                                <li>Liên hệ hotline 0977 139 203 để được hỗ trợ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vận chuyển -->
+                <div class="faq-category" id="shipping">
+                    <h2>Vận chuyển</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Thời gian giao hàng mất bao lâu?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Thời gian giao hàng phụ thuộc vào khu vực của bạn:</p>
+                            <ul>
+                                <li>Nội thành TP.HCM: 1-2 ngày làm việc</li>
+                                <li>Nội thành Hà Nội, Đà Nẵng: 2-3 ngày làm việc</li>
+                                <li>Các tỉnh thành khác: 3-5 ngày làm việc</li>
+                                <li>Khu vực hải đảo, miền núi: 5-7 ngày làm việc</li>
+                            </ul>
+                            <p>Lưu ý: Thời gian trên không bao gồm thời gian xử lý đơn hàng (1-2 ngày làm việc) và có thể bị ảnh hưởng bởi điều kiện thời tiết, giao thông.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Phí vận chuyển được tính như thế nào?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Phí vận chuyển được tính dựa trên khu vực giao hàng và tổng giá trị đơn hàng:</p>
+                            <ul>
+                                <li>Miễn phí vận chuyển cho đơn hàng từ 500.000đ trở lên</li>
+                                <li>Nội thành TP.HCM, Hà Nội, Đà Nẵng: 20.000đ - 30.000đ cho đơn hàng dưới 500.000đ</li>
+                                <li>Các tỉnh thành khác: 30.000đ - 50.000đ cho đơn hàng dưới 500.000đ</li>
+                            </ul>
+                            <p>Phí vận chuyển chính xác sẽ được hiển thị tại trang thanh toán khi bạn nhập địa chỉ giao hàng.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>CybotEcom có giao hàng vào cuối tuần không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Có, CybotEcom có hỗ trợ giao hàng vào cuối tuần (thứ 7 và chủ nhật) cho khu vực nội thành TP.HCM, Hà Nội và một số thành phố lớn. Tuy nhiên, thời gian giao hàng có thể bị hạn chế (từ 9h đến 18h) và phụ thuộc vào lịch làm việc của đơn vị vận chuyển.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để theo dõi đơn hàng đang vận chuyển?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Bạn có thể theo dõi đơn hàng đang vận chuyển bằng các cách sau:</p>
+                            <ul>
+                                <li>Đăng nhập tài khoản và vào mục "Đơn hàng của tôi", nhấn vào "Theo dõi đơn hàng"</li>
+                                <li>Kiểm tra email xác nhận đơn hàng, trong đó có thông tin mã vận đơn và link theo dõi</li>
+                                <li>Nhắn tin với nhân viên hỗ trợ trên website</li>
+                                <li>Gọi hotline 0977 139 203 để được cập nhật tình trạng đơn hàng</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi có thể yêu cầu giao hàng nhanh không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Có, CybotEcom có dịch vụ giao hàng nhanh trong 2-4 giờ cho khu vực nội thành TP.HCM và dịch vụ giao hàng trong 24h cho Hà Nội và Đà Nẵng. Phí giao hàng nhanh sẽ cao hơn phí giao hàng tiêu chuẩn và được hiển thị trong quá trình thanh toán khi bạn chọn phương thức vận chuyển.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh toán -->
+                <div class="faq-category" id="payment">
+                    <h2>Thanh toán</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>CybotEcom chấp nhận những phương thức thanh toán nào?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>CybotEcom chấp nhận các phương thức thanh toán sau:</p>
+                            <ul>
+                                <li>Thanh toán khi nhận hàng (COD)</li>
+                                <li>Thanh toán qua thẻ ATM nội địa/Internet Banking</li>
+                                <li>Thanh toán qua thẻ tín dụng/ghi nợ quốc tế (Visa, Mastercard, JCB, American Express)</li>
+                                <li>Thanh toán qua ví điện tử (MoMo, ZaloPay, VNPay, ShopeePay)</li>
+                                <li>Chuyển khoản ngân hàng</li>
+                                <li>Trả góp qua thẻ tín dụng hoặc công ty tài chính</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Thanh toán online có an toàn không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Thanh toán online tại CybotEcom hoàn toàn an toàn. Chúng tôi sử dụng công nghệ mã hóa SSL để bảo vệ thông tin thanh toán của khách hàng. Đồng thời, chúng tôi không lưu trữ thông tin thẻ tín dụng và tuân thủ các tiêu chuẩn bảo mật quốc tế như PCI DSS.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để mua hàng trả góp?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>CybotEcom hỗ trợ mua hàng trả góp qua hai hình thức chính:</p>
+                            <ol>
+                                <li><strong>Trả góp qua thẻ tín dụng:</strong>
+                                    <ul>
+                                        <li>Áp dụng cho chủ thẻ tín dụng của các ngân hàng liên kết</li>
+                                        <li>Kỳ hạn 3, 6, 9, 12 tháng</li>
+                                        <li>Lãi suất 0% (phí chuyển đổi từ 1.1% - 2%)</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Trả góp qua công ty tài chính:</strong>
+                                    <ul>
+                                        <li>Áp dụng cho người có CMND/CCCD</li>
+                                        <li>Trả trước từ 10% - 50%</li>
+                                        <li>Kỳ hạn 6, 9, 12, 18, 24 tháng</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <p>Để biết thêm chi tiết, vui lòng xem mục <a href="@Url.Action("InstallmentGuide", "Information")">Hướng dẫn trả góp</a>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi đã thanh toán online nhưng không nhận được xác nhận?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Trong một số trường hợp, việc xác nhận thanh toán có thể mất từ 1-2 giờ làm việc. Nếu sau thời gian này bạn vẫn chưa nhận được xác nhận, vui lòng thực hiện các bước sau:</p>
+                            <ol>
+                                <li>Kiểm tra email (kể cả thư mục spam) để tìm email xác nhận từ CybotEcom</li>
+                                <li>Kiểm tra tin nhắn hoặc thông báo từ ngân hàng/ví điện tử để xác nhận giao dịch đã được thực hiện</li>
+                                <li>Đăng nhập vào tài khoản CybotEcom để kiểm tra tình trạng đơn hàng</li>
+                                <li>Liên hệ với chúng tôi qua hotline 0977 139 203 hoặc email support@cybotecom.com và cung cấp thông tin thanh toán để chúng tôi kiểm tra và xử lý</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để nhận hóa đơn VAT?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Để nhận hóa đơn VAT, bạn có thể thực hiện một trong các cách sau:</p>
+                            <ol>
+                                <li>Khi đặt hàng, chọn tùy chọn "Yêu cầu xuất hóa đơn VAT" và điền đầy đủ thông tin xuất hóa đơn</li>
+                                <li>Gửi yêu cầu qua email invoice@cybotecom.com với thông tin đơn hàng và thông tin xuất hóa đơn trong vòng 7 ngày kể từ ngày mua hàng</li>
+                                <li>Liên hệ hotline 0977 139 203 để được hướng dẫn</li>
+                            </ol>
+                            <p>Lưu ý: Hóa đơn VAT sẽ được gửi qua email trong vòng 3-5 ngày làm việc sau khi đơn hàng được giao thành công.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảo hành -->
+                <div class="faq-category" id="warranty">
+                    <h2>Bảo hành</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Thời gian bảo hành sản phẩm là bao lâu?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Thời gian bảo hành tùy thuộc vào từng loại sản phẩm:</p>
+                            <ul>
+                                <li>Laptop: 12 tháng</li>
+                                <li>PC Gaming: 24 tháng</li>
+                                <li>Màn hình: 24-36 tháng (tùy thương hiệu)</li>
+                                <li>Linh kiện: 12-36 tháng (tùy loại)</li>
+                                <li>Phụ kiện: 3-12 tháng (tùy loại)</li>
+                            </ul>
+                            <p>Thời gian bảo hành cụ thể sẽ được ghi rõ trên phiếu bảo hành và trang thông tin sản phẩm.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để kiểm tra tình trạng bảo hành?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Để kiểm tra tình trạng bảo hành, bạn có thể:</p>
+                            <ul>
+                                <li>Truy cập trang web CybotEcom và vào mục "Kiểm tra bảo hành" ở cuối trang</li>
+                                <li>Nhập số serial/IMEI hoặc mã đơn hàng</li>
+                                <li>Liên hệ hotline 0977 139 203 để được hỗ trợ</li>
+                            </ul>
+                            <p>Hoặc bạn có thể mang sản phẩm đến trực tiếp cửa hàng CybotEcom để được kiểm tra.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi cần chuẩn bị gì khi mang sản phẩm đi bảo hành?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Khi mang sản phẩm đi bảo hành, bạn cần mang theo:</p>
+                            <ul>
+                                <li>Sản phẩm cần bảo hành</li>
+                                <li>Phiếu bảo hành (nếu có)</li>
+                                <li>Hóa đơn mua hàng hoặc mã đơn hàng</li>
+                                <li>CMND/CCCD hoặc giấy tờ tùy thân khác</li>
+                            </ul>
+                            <p>Lưu ý: Đối với laptop, vui lòng sao lưu dữ liệu trước khi mang đi bảo hành vì chúng tôi không chịu trách nhiệm về mất mát dữ liệu trong quá trình sửa chữa.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Các trường hợp nào không được bảo hành?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sản phẩm sẽ không được bảo hành trong các trường hợp sau:</p>
+                            <ul>
+                                <li>Hết thời hạn bảo hành</li>
+                                <li>Không có tem bảo hành hoặc tem bảo hành bị rách, mờ, chỉnh sửa</li>
+                                <li>Sản phẩm bị biến dạng, trầy xước, bể vỡ, móp méo do va đập hoặc sử dụng sai hướng dẫn</li>
+                                <li>Sản phẩm bị hư hỏng do thiên tai, hỏa hoạn, lụt lội</li>
+                                <li>Sản phẩm bị hư hỏng do côn trùng hoặc động vật xâm nhập</li>
+                                <li>Sản phẩm đã bị can thiệp, sửa chữa bởi đơn vị không được ủy quyền</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>CybotEcom có bảo hành tại nhà không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Có, CybotEcom có dịch vụ bảo hành tại nhà cho một số sản phẩm như PC, màn hình lớn và một số thiết bị khác. Dịch vụ này áp dụng cho khu vực nội thành TP.HCM, Hà Nội và một số tỉnh thành lớn.</p>
+                            <p>Để yêu cầu dịch vụ bảo hành tại nhà, vui lòng liên hệ hotline 0977 139 203 hoặc đăng ký trực tuyến trên website. Lưu ý rằng dịch vụ này có thể phát sinh phí đối với một số trường hợp.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Đổi trả -->
+                <div class="faq-category" id="return">
+                    <h2>Đổi trả</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Chính sách đổi trả của CybotEcom là gì?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>CybotEcom cam kết:</p>
+                            <ul>
+                                <li>Đổi mới trong 7 ngày đầu tiên nếu sản phẩm có lỗi từ nhà sản xuất</li>
+                                <li>Hoàn tiền 100% nếu sản phẩm không đúng như mô tả</li>
+                                <li>Đổi sang sản phẩm khác (cùng hoặc khác model) nếu khách hàng không hài lòng với sản phẩm đã mua</li>
+                            </ul>
+                            <p>Lưu ý: Sản phẩm đổi trả phải còn nguyên vẹn, đầy đủ phụ kiện, không có dấu hiệu đã qua sử dụng và còn đầy đủ hộp/bao bì.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Thời gian đổi trả sản phẩm là bao lâu?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Thời gian đổi trả như sau:</p>
+                            <ul>
+                                <li><strong>7 ngày đầu tiên:</strong> Đổi mới 1-1 hoặc hoàn tiền 100% nếu sản phẩm có lỗi từ nhà sản xuất</li>
+                                <li><strong>8-15 ngày:</strong> Gửi đi bảo hành, nếu không sửa được sẽ đổi sản phẩm mới</li>
+                                <li><strong>Sau 15 ngày:</strong> Áp dụng chính sách bảo hành thông thường</li>
+                            </ul>
+                            <p>Thời gian tính từ ngày khách hàng nhận được sản phẩm.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để đổi trả sản phẩm?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Để đổi trả sản phẩm, bạn có thể thực hiện theo các bước sau:</p>
+                            <ol>
+                                <li>Liên hệ với CybotEcom qua hotline 0977 139 203 hoặc email support@cybotecom.com để thông báo về việc đổi/trả</li>
+                                <li>Điền vào form yêu cầu đổi/trả (sẽ được gửi qua email)</li>
+                                <li>Đóng gói sản phẩm cẩn thận với đầy đủ phụ kiện, hộp/bao bì và phiếu bảo hành</li>
+                                <li>Mang sản phẩm đến cửa hàng CybotEcom hoặc gửi về địa chỉ được cung cấp</li>
+                            </ol>
+                            <p>Sau khi nhận được sản phẩm, chúng tôi sẽ kiểm tra và xử lý yêu cầu đổi/trả trong vòng 3-5 ngày làm việc.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi sẽ được hoàn tiền như thế nào?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Hình thức hoàn tiền sẽ tương ứng với phương thức thanh toán ban đầu:</p>
+                            <ul>
+                                <li><strong>Thanh toán qua thẻ tín dụng/ghi nợ:</strong> Hoàn tiền vào thẻ (7-15 ngày làm việc)</li>
+                                <li><strong>Thanh toán qua ví điện tử:</strong> Hoàn tiền vào ví (1-3 ngày làm việc)</li>
+                                <li><strong>Chuyển khoản ngân hàng:</strong> Hoàn tiền vào tài khoản ngân hàng (2-5 ngày làm việc)</li>
+                                <li><strong>Thanh toán tiền mặt/COD:</strong> Hoàn tiền mặt tại cửa hàng hoặc chuyển khoản</li>
+                            </ul>
+                            <p>Thời gian hoàn tiền có thể thay đổi tùy thuộc vào chính sách của ngân hàng hoặc đơn vị thanh toán.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Ai chịu phí vận chuyển khi đổi/trả sản phẩm?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Việc chi trả phí vận chuyển phụ thuộc vào lý do đổi/trả:</p>
+                            <ul>
+                                <li>Nếu sản phẩm bị lỗi từ nhà sản xuất hoặc không đúng như mô tả: CybotEcom sẽ chịu phí vận chuyển</li>
+                                <li>Nếu khách hàng đổi/trả vì lý do cá nhân (không thích, đổi ý, v.v.): Khách hàng sẽ chịu phí vận chuyển</li>
+                            </ul>
+                            <p>Trong một số trường hợp đặc biệt, chúng tôi có thể hỗ trợ chi phí vận chuyển cho khách hàng.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tài khoản -->
+                <div class="faq-category" id="account">
+                    <h2>Tài khoản</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để đăng ký tài khoản?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Để đăng ký tài khoản CybotEcom, bạn có thể thực hiện theo các bước sau:</p>
+                            <ol>
+                                <li>Truy cập website CybotEcom</li>
+                                <li>Nhấn vào biểu tượng "Tài khoản" ở góc phải trên cùng</li>
+                                <li>Chọn "Đăng ký"</li>
+                                <li>Điền đầy đủ thông tin cá nhân (họ tên, email, số điện thoại, mật khẩu)</li>
+                                <li>Xác nhận đăng ký qua email hoặc OTP gửi đến số điện thoại</li>
+                            </ol>
+                            <p>Sau khi hoàn tất đăng ký, bạn có thể đăng nhập và sử dụng các tính năng của tài khoản.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi quên mật khẩu phải làm sao?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Nếu bạn quên mật khẩu, vui lòng thực hiện các bước sau:</p>
+                            <ol>
+                                <li>Truy cập trang đăng nhập của CybotEcom</li>
+                                <li>Nhấn vào link "Quên mật khẩu?"</li>
+                                <li>Nhập email đã đăng ký tài khoản</li>
+                                <li>Kiểm tra email để nhận link đặt lại mật khẩu</li>
+                                <li>Nhấn vào link và tạo mật khẩu mới</li>
+                            </ol>
+                            <p>Nếu bạn không nhận được email, vui lòng kiểm tra thư mục spam hoặc liên hệ hỗ trợ khách hàng.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để cập nhật thông tin tài khoản?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Để cập nhật thông tin tài khoản, bạn cần:</p>
+                            <ol>
+                                <li>Đăng nhập vào tài khoản CybotEcom</li>
+                                <li>Vào mục "Tài khoản của tôi"</li>
+                                <li>Chọn "Thông tin cá nhân" hoặc "Thông tin tài khoản"</li>
+                                <li>Cập nhật thông tin cần thay đổi</li>
+                                <li>Nhấn "Lưu" hoặc "Cập nhật"</li>
+                            </ol>
+                            <p>Lưu ý: Một số thông tin quan trọng như email chính có thể yêu cầu xác minh khi thay đổi.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tài khoản CybotEcom có những lợi ích gì?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Khi có tài khoản CybotEcom, bạn sẽ được hưởng nhiều lợi ích:</p>
+                            <ul>
+                                <li>Theo dõi đơn hàng và lịch sử mua hàng</li>
+                                <li>Lưu thông tin giao hàng và thanh toán cho lần mua sau</li>
+                                <li>Tích lũy điểm thưởng và đổi quà</li>
+                                <li>Nhận thông tin khuyến mãi và ưu đãi đặc biệt</li>
+                                <li>Tham gia chương trình khách hàng thân thiết</li>
+                                <li>Nhận ưu đãi sinh nhật và các dịp đặc biệt</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Làm thế nào để xóa tài khoản?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Nếu bạn muốn xóa tài khoản CybotEcom, vui lòng liên hệ với chúng tôi qua email support@cybotecom.com hoặc hotline 0977 139 203. Chúng tôi sẽ xác minh danh tính của bạn và hỗ trợ xóa tài khoản.</p>
+                            <p>Lưu ý: Việc xóa tài khoản sẽ dẫn đến mất tất cả thông tin lịch sử đơn hàng, điểm thưởng và các ưu đãi đang có. Hành động này không thể hoàn tác.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Không tìm thấy kết quả</h3>
+                <p>Vui lòng thử lại với từ khóa khác hoặc liên hệ với chúng tôi qua hotline 0977 139 203</p>
+            </div>
+
+            <div class="contact-support">
+                <h2>Bạn không tìm thấy câu trả lời?</h2>
+                <p>Vui lòng liên hệ với chúng tôi để được hỗ trợ nhanh chóng</p>
+                <div class="support-buttons">
+                    <a href="@Url.Action("Contact", "Information")" class="btn-contact">
+                        <i class="fas fa-headset"></i>
+                        Liên hệ hỗ trợ
+                    </a>
+                    <a href="tel:0977139203" class="btn-call">
+                        <i class="fas fa-phone"></i>
+                        0977 139 203
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle FAQ answers
+            const questions = document.querySelectorAll('.faq-question');
+            questions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    if (answer.style.maxHeight) {
+                        answer.style.maxHeight = null;
+                        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                    } else {
+                        answer.style.maxHeight = answer.scrollHeight + "px";
+                        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                    }
+                });
+            });
+            
+            // Category filter
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const categories = document.querySelectorAll('.faq-category');
+            
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Remove active class from all buttons
+                    categoryBtns.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show/hide categories
+                    if (category === 'all') {
+                        categories.forEach(cat => cat.style.display = 'block');
+                    } else {
+                        categories.forEach(cat => {
+                            if (cat.id === category) {
+                                cat.style.display = 'block';
+                            } else {
+                                cat.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    document.querySelector('.no-results').style.display = 'none';
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('faq-search');
+            const faqItems = document.querySelectorAll('.faq-item');
+            const noResults = document.querySelector('.no-results');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let resultsFound = false;
+                    
+                    if (searchTerm === '') {
+                        // Reset view if search is empty
+                        const activeBtn = document.querySelector('.category-btn.active');
+                        if (activeBtn) {
+                            activeBtn.click();
+                        } else {
+                            document.querySelector('.category-btn[data-category="all"]').click();
+                        }
+                        noResults.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Show all categories for search
+                    categories.forEach(cat => cat.style.display = 'block');
+                    
+                    // Filter FAQ items
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                        
+                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                            resultsFound = true;
+                            
+                            // Expand matching items
+                            const answerElement = item.querySelector('.faq-answer');
+                            const iconElement = item.querySelector('.faq-question i');
+                            answerElement.style.maxHeight = answerElement.scrollHeight + "px";
+                            iconElement.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show "no results" message if needed
+                    noResults.style.display = resultsFound ? 'none' : 'block';
+                    
+                    // Hide empty categories
+                    categories.forEach(category => {
+                        const visibleItems = category.querySelectorAll('.faq-item[style="display: block;"]');
+                        if (visibleItems.length === 0) {
+                            category.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .faq-page {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .faq-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        #faq-search {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        #faq-search:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+            border-color: #80bdff;
+        }
+
+        .faq-categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .category-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #f1f1f1;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-category {
+            margin-bottom: 40px;
+        }
+
+        .faq-category h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+
+        .faq-question h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .faq-question i {
+            color: #007bff;
+            transition: transform 0.3s;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-answer p {
+            margin-top: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .faq-answer ul, 
+        .faq-answer ol {
+            color: #555;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer li {
+            margin-bottom: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .no-results h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #666;
+        }
+
+        .contact-support {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .contact-support h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .contact-support p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .support-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-contact,
+        .btn-call {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-contact {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-call {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-contact:hover {
+            background: #0056b3;
+        }
+
+        .btn-call:hover {
+            background: #e9ecef;
+        }
+
+        .btn-contact i,
+        .btn-call i {
+            margin-right: 10px;
+        }
+
+        @@media (max-width: 768px) {
+            .faq-question h3 {
+                font-size: 1rem;
+            }
+
+            .support-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn-contact,
+            .btn-call {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+} 

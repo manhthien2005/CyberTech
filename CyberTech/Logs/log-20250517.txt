@@ -1,0 +1,38 @@
+2025-05-17 18:49:24.162 +07:00 [INF] Starting web application
+2025-05-17 18:49:24.211 +07:00 [INF] User profile is available. Using 'C:\Users\deanl\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-05-17 18:49:24.247 +07:00 [INF] Now listening on: http://localhost:5246
+2025-05-17 18:49:24.250 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-05-17 18:49:24.252 +07:00 [INF] Hosting environment: Development
+2025-05-17 18:49:24.252 +07:00 [INF] Content root path: C:\Users\deanl\source\repos\CyberTech\CyberTech
+2025-05-17 18:49:31.170 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/ - null null
+2025-05-17 18:49:31.178 +07:00 [WRN] Failed to determine the https port for redirect.
+2025-05-17 18:49:31.185 +07:00 [INF] Executing endpoint 'CyberTech.Controllers.HomeController.Index (CyberTech)'
+2025-05-17 18:49:31.201 +07:00 [INF] Route matched with {action = "Index", controller = "Home"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller CyberTech.Controllers.HomeController (CyberTech).
+2025-05-17 18:49:31.204 +07:00 [INF] Home page visited
+2025-05-17 18:49:31.214 +07:00 [INF] Executing ViewResult, running view Index.
+2025-05-17 18:49:31.253 +07:00 [INF] Executed ViewResult - view Index executed in 41.8745ms.
+2025-05-17 18:49:31.258 +07:00 [INF] Executed action CyberTech.Controllers.HomeController.Index (CyberTech) in 54.9004ms
+2025-05-17 18:49:31.259 +07:00 [INF] Executed endpoint 'CyberTech.Controllers.HomeController.Index (CyberTech)'
+2025-05-17 18:49:31.262 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/ - 200 null text/html; charset=utf-8 93.1681ms
+2025-05-17 18:49:31.276 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/lib/bootstrap/dist/css/bootstrap.min.css - null null
+2025-05-17 18:49:31.277 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/css/site.css?v=pAGv4ietcJNk_EwsQZ5BN9-K4MuNYS2a9wl4Jw-q9D0 - null null
+2025-05-17 18:49:31.282 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/CyberTech.styles.css?v=9Zt3Bb9dsvxUpAwmuFJuT6XnuhwzwFOu9uwbxVt2oTo - null null
+2025-05-17 18:49:31.282 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/lib/jquery/dist/jquery.min.js - null null
+2025-05-17 18:49:31.282 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/lib/bootstrap/dist/js/bootstrap.bundle.min.js - null null
+2025-05-17 18:49:31.282 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - null null
+2025-05-17 18:49:31.290 +07:00 [INF] Sending file. Request path: '/css/site.css'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\css\site.css'
+2025-05-17 18:49:31.290 +07:00 [INF] Sending file. Request path: '/CyberTech.styles.css'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\obj\Debug\net8.0\scopedcss\bundle\CyberTech.styles.css'
+2025-05-17 18:49:31.291 +07:00 [INF] Sending file. Request path: '/lib/jquery/dist/jquery.min.js'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\lib\jquery\dist\jquery.min.js'
+2025-05-17 18:49:31.294 +07:00 [INF] Sending file. Request path: '/lib/bootstrap/dist/js/bootstrap.bundle.min.js'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js'
+2025-05-17 18:49:31.295 +07:00 [INF] Sending file. Request path: '/lib/bootstrap/dist/css/bootstrap.min.css'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css'
+2025-05-17 18:49:31.296 +07:00 [INF] Sending file. Request path: '/js/site.js'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\js\site.js'
+2025-05-17 18:49:31.297 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/css/site.css?v=pAGv4ietcJNk_EwsQZ5BN9-K4MuNYS2a9wl4Jw-q9D0 - 200 362 text/css 19.2605ms
+2025-05-17 18:49:31.300 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/CyberTech.styles.css?v=9Zt3Bb9dsvxUpAwmuFJuT6XnuhwzwFOu9uwbxVt2oTo - 200 1127 text/css 17.9822ms
+2025-05-17 18:49:31.300 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/lib/jquery/dist/jquery.min.js - 200 89501 text/javascript 18.2598ms
+2025-05-17 18:49:31.302 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/lib/bootstrap/dist/js/bootstrap.bundle.min.js - 200 78468 text/javascript 20.041ms
+2025-05-17 18:49:31.304 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/lib/bootstrap/dist/css/bootstrap.min.css - 200 162720 text/css 27.7733ms
+2025-05-17 18:49:31.306 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo - 200 231 text/javascript 23.408ms
+2025-05-17 18:49:31.324 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5246/favicon.ico - null null
+2025-05-17 18:49:31.328 +07:00 [INF] Sending file. Request path: '/favicon.ico'. Physical path: 'C:\Users\deanl\source\repos\CyberTech\CyberTech\wwwroot\favicon.ico'
+2025-05-17 18:49:31.330 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5246/favicon.ico - 200 5430 image/x-icon 5.091ms
+2025-05-17 18:50:10.810 +07:00 [INF] Application is shutting down...

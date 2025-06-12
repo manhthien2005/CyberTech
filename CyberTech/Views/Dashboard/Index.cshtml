@@ -1,0 +1,636 @@
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model CyberTech.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/Admin/_Layout.cshtml";
+}
+
+@section Styles {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .dashboard-header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .revenue-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .orders-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .products-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .customers-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            color: #48bb78;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-section, .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-selector {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 15px;
+            background: white;
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-selector:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-item:hover {
+            background: #e2e8f0;
+            transform: translateX(5px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .recent-orders {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .orders-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Ship Status Badges */
+        .ship-cho-xac-nhan { background: #fed7d7; color: #c53030; }
+        .ship-dang-chuan-bi { background: #fef2c7; color: #d69e2e; }
+        .ship-dang-giao { background: #fbb6ce; color: #b83280; }
+        .ship-da-giao { background: #bee3f8; color: #2b6cb0; }
+        .ship-hoan-thanh { background: #c6f6d5; color: #2f855a; }
+        .ship-da-huy { background: #e2e8f0; color: #4a5568; }
+        .ship-da-hoan-tra { background: #d6f5d6; color: #38a169; }
+
+        /* Payment Status Badges */
+        .payment-cho-thanh-toan { background: #fed7d7; color: #c53030; }
+        .payment-dang-xu-ly { background: #fef2c7; color: #d69e2e; }
+        .payment-da-thanh-toan { background: #c6f6d5; color: #2f855a; }
+        .payment-that-bai { background: #fed7d7; color: #c53030; }
+        .payment-da-huy { background: #e2e8f0; color: #4a5568; }
+        .payment-da-hoan-tien { background: #d6f5d6; color: #38a169; }
+        .payment-chua-thanh-toan { background: #e2e8f0; color: #4a5568; }
+
+        .loading-chart {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            color: #718096;
+        }
+
+        @@media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .orders-table {
+                font-size: 0.9rem;
+            }
+
+            .status-badge {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+            }
+        }
+    </style>
+}
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard CyberTech</h1>
+        <p>Quản lý website bán thiết bị điện tử - Chào mừng trở lại!</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon revenue-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model.TotalRevenue.ToString("N0") VNĐ</div>
+            <div class="stat-label">Tổng Doanh Thu</div>
+            <div class="stat-change">
+                @if (Model.MonthlyGrowth >= 0)
+                {
+                    <span style="color: #48bb78;">+@Model.MonthlyGrowth% so với tháng trước</span>
+                }
+                else
+                {
+                    <span style="color: #f56565;">@Model.MonthlyGrowth% so với tháng trước</span>
+                }
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon orders-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model.TotalOrders.ToString("N0")</div>
+            <div class="stat-label">Tổng Đơn Hàng</div>
+            <div class="stat-change">+@Model.TodayOrders đơn hôm nay</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon products-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model.TotalProducts.ToString("N0")</div>
+            <div class="stat-label">Sản Phẩm</div>
+            <div class="stat-change">+@Model.NewProducts sản phẩm mới</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon customers-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="stat-value">@Model.TotalCustomers.ToString("N0")</div>
+            <div class="stat-label">Khách Hàng</div>
+            <div class="stat-change">+@Model.NewCustomers thành viên mới</div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Doanh Thu Theo Thời Gian
+                </h3>
+                <select id="timePeriod" class="time-selector">
+                    <option value="7days">7 Ngày Qua</option>
+                    <option value="30days">30 Ngày Qua</option>
+                    <option value="3months">3 Tháng Qua</option>
+                    <option value="6months">6 Tháng Qua</option>
+                </select>
+            </div>
+            <div class="loading-chart" id="loadingChart">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
+            </div>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Thao Tác Nhanh
+            </h3>
+            <a href="/ProductManage" class="action-item">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 600;">Thêm Sản Phẩm</div>
+                    <div style="font-size: 0.9rem; color: #718096;">Thêm sản phẩm mới vào kho</div>
+                </div>
+            </a>
+            <a href="/OrderManage" class="action-item">
+                <div class="action-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 600;">Xem Đơn Hàng</div>
+                    <div style="font-size: 0.9rem; color: #718096;">Quản lý đơn hàng</div>
+                </div>
+            </a>
+            <a href="/CustomerManage" class="action-item">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 600;">Quản Lý Khách Hàng</div>
+                    <div style="font-size: 0.9rem; color: #718096;">Xem thông tin khách hàng</div>
+                </div>
+            </a>
+            <a href="#" class="action-item">
+                <div class="action-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 600;">Báo Cáo</div>
+                    <div style="font-size: 0.9rem; color: #718096;">Xem báo cáo chi tiết</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="recent-orders">
+        <h3 class="section-title">
+            <i class="fas fa-clock"></i>
+            Đơn Hàng Gần Đây
+        </h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Sản Phẩm</th>
+                    <th>Giá Trị</th>
+                    <th><i class="fas fa-shipping-fast"></i> Giao Hàng</th>
+                    <th><i class="fas fa-credit-card"></i> Thanh Toán</th>
+                    <th>Ngày</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.RecentOrders)
+                {
+                    <tr>
+                        <td>@order.OrderCode</td>
+                        <td>@order.CustomerName</td>
+                        <td>@order.ProductName</td>
+                        <td>@order.TotalValue.ToString("N0") VNĐ</td>
+                        <td>
+                            <span class="status-badge @(GetShipStatusClass(order.ShipStatus))">
+                                @{
+                                    var shipIcon = GetShipStatusIcon(order.ShipStatus);
+                                }
+                                <i class="@shipIcon"></i>
+                                @order.ShipStatus
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge @(GetPaymentStatusClass(order.PaymentStatus))">
+                                @{
+                                    var paymentIcon = GetPaymentStatusIcon(order.PaymentStatus);
+                                }
+                                <i class="@paymentIcon"></i>
+                                @order.PaymentStatus
+                            </span>
+                        </td>
+                        <td>@order.CreatedDate.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+                @if (!Model.RecentOrders.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #718096; padding: 20px;">
+                            Chưa có đơn hàng nào
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let revenueChart;
+        
+        // Khởi tạo chart với dữ liệu mặc định
+        function initializeChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const chartData = @Html.Raw(Json.Serialize(Model.RevenueChart));
+            
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(item => item.date),
+                    datasets: [{
+                        label: 'Doanh Thu (Triệu VNĐ)',
+                        data: chartData.map(item => item.revenue),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'M';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cập nhật chart khi thay đổi mốc thời gian
+        function updateChart(period) {
+            document.getElementById('loadingChart').style.display = 'block';
+            document.getElementById('revenueChart').style.display = 'none';
+
+            fetch(`/Dashboard/GetRevenueData?period=${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    revenueChart.data.labels = data.map(item => item.date);
+                    revenueChart.data.datasets[0].data = data.map(item => item.revenue);
+                    revenueChart.update();
+                    
+                    document.getElementById('loadingChart').style.display = 'none';
+                    document.getElementById('revenueChart').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    document.getElementById('loadingChart').style.display = 'none';
+                    document.getElementById('revenueChart').style.display = 'block';
+                });
+        }
+
+        // Event listener cho dropdown
+        document.getElementById('timePeriod').addEventListener('change', function() {
+            updateChart(this.value);
+        });
+
+        // Khởi tạo chart khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+        });
+    </script>
+}
+
+@functions {
+    public string GetShipStatusClass(string status)
+    {
+        return status switch
+        {
+            "Chờ xác nhận" => "ship-cho-xac-nhan",
+            "Đang chuẩn bị" => "ship-dang-chuan-bi",
+            "Đang giao" => "ship-dang-giao",
+            "Đã giao" => "ship-da-giao",
+            "Hoàn thành" => "ship-hoan-thanh",
+            "Đã hủy" => "ship-da-huy",
+            "Đã hoàn trả" => "ship-da-hoan-tra",
+            _ => "ship-cho-xac-nhan"
+        };
+    }
+
+    public string GetPaymentStatusClass(string status)
+    {
+        return status switch
+        {
+            "Chờ thanh toán" => "payment-cho-thanh-toan",
+            "Đang xử lý" => "payment-dang-xu-ly",
+            "Đã thanh toán" => "payment-da-thanh-toan",
+            "Thất bại" => "payment-that-bai",
+            "Đã hủy" => "payment-da-huy",
+            "Đã hoàn tiền" => "payment-da-hoan-tien",
+            "Chưa thanh toán" => "payment-chua-thanh-toan",
+            _ => "payment-chua-thanh-toan"
+        };
+    }
+
+    public string GetShipStatusIcon(string status)
+    {
+        return status switch
+        {
+            "Chờ xác nhận" => "fas fa-clock",
+            "Đang chuẩn bị" => "fas fa-box",
+            "Đang giao" => "fas fa-truck",
+            "Đã giao" => "fas fa-check-circle",
+            "Hoàn thành" => "fas fa-star",
+            "Đã hủy" => "fas fa-times-circle",
+            "Đã hoàn trả" => "fas fa-undo",
+            _ => "fas fa-question-circle"
+        };
+    }
+
+    public string GetPaymentStatusIcon(string status)
+    {
+        return status switch
+        {
+            "Chờ thanh toán" => "fas fa-clock",
+            "Đang xử lý" => "fas fa-spinner",
+            "Đã thanh toán" => "fas fa-check-circle",
+            "Thất bại" => "fas fa-exclamation-triangle",
+            "Đã hủy" => "fas fa-times-circle",
+            "Đã hoàn tiền" => "fas fa-undo",
+            "Chưa thanh toán" => "fas fa-credit-card",
+            _ => "fas fa-question-circle"
+        };
+    }
+}

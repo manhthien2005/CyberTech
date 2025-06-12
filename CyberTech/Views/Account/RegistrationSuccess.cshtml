@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Đăng ký thành công";
+    Layout = "_Layout";
+}
+
+<div class="account-container">
+    <div class="account-card">
+        <div class="account-header">
+            <h2>Đăng ký thành công!</h2>
+        </div>
+        
+        <div class="registration-success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <p>Tài khoản của bạn đã được tạo thành công. Chúng tôi đã gửi một email xác minh đến địa chỉ email mà bạn đã đăng ký.</p>
+            
+            <p>Vui lòng kiểm tra hộp thư của bạn và nhấp vào liên kết xác minh để hoàn tất quá trình đăng ký.</p>
+            
+            <div class="note-box">
+                <p><strong>Lưu ý:</strong></p>
+                <ul>
+                    <li>Liên kết xác minh sẽ hết hạn sau 1 giờ</li>
+                    <li>Nếu bạn không nhận được email, vui lòng kiểm tra thư mục spam</li>
+                    <li>Bạn vẫn có thể đăng nhập mà không cần xác minh email, nhưng chúng tôi khuyên bạn nên xác minh để bảo mật tài khoản</li>
+                </ul>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="@Url.Action("Login", "Account")" class="btn-account btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-pages.css">
+    <style>
+        .registration-success-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        
+        .note-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .note-box ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .note-box li {
+            margin-bottom: 5px;
+        }
+        
+        .action-buttons {
+            margin-top: 25px;
+        }
+    </style>
+} 

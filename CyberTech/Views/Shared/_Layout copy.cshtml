@@ -1,0 +1,502 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - CybotEcom</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Backup FontAwesome nếu CDN chính lỗi -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="stylesheet" href="~/css/responsive.css">
+    <link rel="stylesheet" href="~/css/site.css">
+    <link rel="stylesheet" href="~/css/account.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/chat-widget.css" asp-append-version="true" />
+    <style>
+        /* Cart Badge Styles */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .action-item {
+            position: relative;
+        }
+        
+        .cart-count.updated {
+            transform: scale(1.3);
+        }
+    </style>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="top-banner">
+            <div class="container">
+                <span>Miễn phí vận chuyển cho đơn hàng từ 500.000đ</span>
+            </div>
+        </div>
+        <div class="main-header">
+            <div class="container">
+                <div class="logo">
+                    <a href="@Url.Action("Index", "Home")">
+                        <img src="~/images/cybot_logo.png" alt="Cybot Tech Logo">
+                    </a>
+                </div>
+                <div class="search-bar">
+                    <form action="@Url.Action("Search", "Product")" method="get" id="searchForm">
+                        <div class="search-container">
+                            <input type="text" name="SearchQuery" id="searchInput" placeholder="Bạn cần tìm gì?" autocomplete="off">
+                            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                            
+                            <!-- Search Suggestions Dropdown -->
+                            <div class="search-suggestions" id="searchSuggestions">
+                                <div class="suggestions-header">
+                                    <span>Gợi ý sản phẩm</span>
+                                </div>
+                                <div class="suggestions-content">
+                                    <!-- Suggestions will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <a href="tel:0977139203" class="action-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div class="action-content">
+                            <span>Hotline</span>
+                            <strong>0977 139 203</strong>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("Orders", "Account")" class="action-item">
+                        <i class="fas fa-truck"></i>
+                        <div class="action-content">
+                            <span>Tra cứu</span>
+                            <strong>Đơn hàng</strong>
+                        </div>
+                    </a>
+                    <a href="@Url.Action("Index", "Cart")" class="action-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="action-content">
+                            <span><strong>Giỏ Hàng</strong></span>
+                        </div>
+                        <span class="cart-badge cart-count">0</span>
+                    </a>
+                    <div class="action-item user-dropdown">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user"></i>
+                                    <div class="action-content">
+                                        <span>Xin chào</span>
+                                        <strong>@User.Identity.Name</strong>
+                                    </div>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Profile", "Account")">
+                                            <i class="fas fa-user-circle"></i>
+                                            Thông tin tài khoản
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Orders", "Account")">
+                                            <i class="fas fa-shopping-bag"></i>
+                                            Đơn hàng của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Wishlist", "Account")">
+                                            <i class="fas fa-heart"></i>
+                                            Danh sách yêu thích
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Addresses", "Account")">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Sổ địa chỉ
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Vouchers", "Account")">
+                                            <i class="fas fa-ticket-alt"></i>
+                                            Kho voucher
+                                            @{
+                                                var voucherCount = Context.Session.GetString("VoucherCount");
+                                                if (!string.IsNullOrEmpty(voucherCount) && int.Parse(voucherCount) > 0)
+                                                {
+                                                    <span class="badge bg-danger rounded-pill ms-2">@voucherCount</span>
+                                                }
+                                            }
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            Đăng xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Account")" class="action-item">
+                                <i class="fas fa-user"></i>
+                                <div class="action-content">
+                                    <span><strong>Đăng Nhập</strong></span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <div class="container">
+                <ul class="service-links">
+                    <li><a href="@Url.Action("Index", "Product", new { category = "pc-gaming" })"><i class="fas fa-desktop"></i> Tặng màn 240Hz khi Build PC</a></li>
+                    <li><a href="#"><i class="fas fa-newspaper"></i> Tin công nghệ</a></li>
+                    <li><a href="#"><i class="fas fa-tools"></i> Dịch vụ sửa chữa</a></li>
+                    <li><a href="#"><i class="fas fa-home"></i> Dịch vụ kỹ thuật tại nhà</a></li>
+                    <li><a href="#"><i class="fas fa-exchange-alt"></i> Thu cũ đổi mới</a></li>
+                    <li><a href="@Url.Action("Index", "Orders")"><i class="fas fa-shield-alt"></i> Tra cứu bảo hành</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+    @await Html.PartialAsync("_ChatWidget")
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-column">
+                    <h3>Về CybotEcom</h3>
+                    <ul>
+                        <li><a href="@Url.Action("About", "Information")">Giới thiệu</a></li>
+                        <li><a href="@Url.Action("Careers", "Information")">Tuyển dụng</a></li>
+                        <li><a href="@Url.Action("News", "Information")">Tin tức</a></li>
+                        <li><a href="@Url.Action("Contact", "Information")">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Chính sách</h3>
+                    <ul>
+                        <li><a href="@Url.Action("Warranty", "Information")">Chính sách bảo hành</a></li>
+                        <li><a href="@Url.Action("Payment", "Information")">Chính sách thanh toán</a></li>
+                        <li><a href="@Url.Action("Shipping", "Information")">Chính sách vận chuyển</a></li>
+                        <li><a href="@Url.Action("Privacy", "Information")">Chính sách bảo mật</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Hỗ trợ khách hàng</h3>
+                    <ul>
+                        <li><a href="@Url.Action("ShoppingGuide", "Information")">Hướng dẫn mua hàng</a></li>
+                        <li><a href="@Url.Action("PaymentGuide", "Information")">Hướng dẫn thanh toán</a></li>
+                        <li><a href="@Url.Action("InstallmentGuide", "Information")">Hướng dẫn trả góp</a></li>
+                        <li><a href="@Url.Action("FAQ", "Information")">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Thông tin liên hệ</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 1, Thảo Điền, TP. HCM</p>
+                    <p><i class="fas fa-phone-alt"></i> Hotline: 0977 139 203</p>
+                    <p><i class="fas fa-envelope"></i> Email: cybotecom@gmail.com</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year CybotEcom. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/main.js"></script>
+    <script src="~/js/utils.js"></script>
+    <script src="~/js/chat-widget.js" asp-append-version="true"></script>
+    <script>
+        // Fetch initial cart count
+        $(document).ready(function() {
+            // Function to update cart count
+            window.updateCartCount = function(count) {
+                const cartCountElements = document.querySelectorAll('.cart-count');
+                cartCountElements.forEach(element => {
+                    element.textContent = count;
+                    element.classList.add('updated');
+                    setTimeout(() => element.classList.remove('updated'), 1000);
+                });
+            };
+
+            // Function to update voucher count
+            window.updateVoucherCount = function(count) {
+                const voucherBadge = document.querySelector('.dropdown-item[href*="Vouchers"] .badge');
+                if (count > 0) {
+                    if (voucherBadge) {
+                        voucherBadge.textContent = count;
+                    } else {
+                        const voucherLink = document.querySelector('.dropdown-item[href*="Vouchers"]');
+                        if (voucherLink) {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-danger rounded-pill ms-2';
+                            badge.textContent = count;
+                            voucherLink.appendChild(badge);
+                        }
+                    }
+                } else if (voucherBadge) {
+                    voucherBadge.remove();
+                }
+            };
+            
+            // Fetch initial cart count
+            $.ajax({
+                url: '/Cart/GetCartCount',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        updateCartCount(response.count);
+                    }
+                }
+            });
+
+            // Fetch initial voucher count
+            if (document.querySelector('.dropdown-item[href*="Vouchers"]')) {
+                $.ajax({
+                    url: '/Account/GetActiveVoucherCount',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            updateVoucherCount(response.count);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        // Search functionality
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        const searchForm = document.getElementById('searchForm');
+        
+        // Handle search input
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                clearTimeout(searchTimeout);
+                
+                if (query.length >= 2) {
+                    searchTimeout = setTimeout(() => {
+                        fetchSearchSuggestions(query);
+                    }, 300);
+                } else {
+                    hideSuggestions();
+                }
+            });
+            
+            // Handle focus
+            searchInput.addEventListener('focus', function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    fetchSearchSuggestions(query);
+                }
+            });
+            
+            // Handle blur with delay to allow clicking on suggestions
+            searchInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    hideSuggestions();
+                }, 200);
+            });
+        }
+        
+        // Fetch search suggestions
+        async function fetchSearchSuggestions(query) {
+            try {
+                showLoadingSuggestions();
+                
+                const response = await fetch(`/Product/SearchSuggestions?query=${encodeURIComponent(query)}&limit=15`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    displaySuggestions(result.data);
+                } else {
+                    showEmptySuggestions();
+                }
+            } catch (error) {
+                console.error('Error fetching search suggestions:', error);
+                showEmptySuggestions();
+            }
+        }
+        
+        // Show loading state
+        function showLoadingSuggestions() {
+            const suggestionsContent = document.querySelector('.suggestions-content');
+            if (suggestionsContent) {
+                suggestionsContent.innerHTML = '<div class="suggestions-loading"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</div>';
+                searchSuggestions.classList.add('show');
+            }
+        }
+        
+        // Show empty state
+        function showEmptySuggestions() {
+            const suggestionsContent = document.querySelector('.suggestions-content');
+            if (suggestionsContent) {
+                suggestionsContent.innerHTML = '<div class="suggestions-empty"><i class="fas fa-search"></i> Không tìm thấy sản phẩm phù hợp</div>';
+                searchSuggestions.classList.add('show');
+            }
+        }
+        
+        // Display suggestions
+        function displaySuggestions(suggestions) {
+            const suggestionsContent = document.querySelector('.suggestions-content');
+            if (!suggestionsContent) return;
+            
+            let html = '';
+            suggestions.forEach(item => {
+                // Use simple property names from API
+                const productId = item.id;
+                const productName = item.name || 'Sản phẩm';
+                const price = item.price || 0;
+                const currentPrice = item.currentPrice || price;
+                const salePercentage = item.salePercentage;
+                const imageUrl = item.image || '/images/no-image.png';
+                const hasSale = item.hasSale || false;
+                
+                const productUrl = `/Product/ProductDetail/${productId}`;
+                
+                // Price display theo format mới
+                let priceHtml = '';
+                if (hasSale) {
+                    // Có sale: giá gốc gạch ngang + giá sale lớn hơn
+                    const discountPercent = salePercentage > 0 
+                        ? salePercentage 
+                        : Math.round(((price - currentPrice) / price) * 100);
+                    
+                    priceHtml = `
+                        <div class="suggestion-price-container">
+                            <span style="color: #333; font-size: 12px; text-decoration: line-through; margin-bottom: 2px; display: block;">${formatCurrency(price)}</span>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="color: #dc3545; font-weight: 700; font-size: 14px;">${formatCurrency(currentPrice)}</span>
+                                <span style="background: #dc3545; color: white; padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 600;">-${discountPercent}%</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Không sale: chỉ giá đen
+                    priceHtml = `<span style="color: #333; font-weight: 600; font-size: 14px;">${formatCurrency(price)}</span>`;
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="goToProduct('${productUrl}')">
+                        <img src="${imageUrl}" alt="${productName}" class="suggestion-image" onerror="this.src='/images/no-image.png'">
+                        <div class="suggestion-details">
+                            <div class="suggestion-name">${productName}</div>
+                            <div class="suggestion-price">
+                                ${priceHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            suggestionsContent.innerHTML = html;
+            searchSuggestions.classList.add('show');
+        }
+        
+        // Hide suggestions
+        function hideSuggestions() {
+            if (searchSuggestions) {
+                searchSuggestions.classList.remove('show');
+            }
+        }
+        
+        // Go to product page
+        function goToProduct(url) {
+            window.location.href = url;
+        }
+        
+        // Format currency
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number') {
+                amount = parseFloat(amount) || 0;
+            }
+            return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+        }
+        
+        // Handle form submission
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Form will submit normally to Search action
+            });
+        }
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                hideSuggestions();
+            }
+        });
+        
+        // Handle keyboard navigation
+        if (searchInput) {
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideSuggestions();
+                    this.blur();
+                }
+            });
+        }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

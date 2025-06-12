@@ -1,0 +1,195 @@
+/* Reset và Base Styles */
+.page-header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.page-header p {
+    margin: 5px 0 0;
+    color: #6c757d;
+}
+
+/* Rank Management Container */
+.rank-management-container {
+    padding: 20px;
+}
+
+/* Rank Grid */
+.rank-grid {
+    margin-bottom: 20px;
+}
+
+/* Rank Card */
+.rank-card {
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    position: relative;
+}
+
+.rank-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.rank-card-header {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.rank-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.rank-card-priority {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.rank-card-body {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.rank-card-info {
+    margin-bottom: 10px;
+}
+
+.rank-card-info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 2px;
+}
+
+.rank-card-info-value {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.rank-card-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 10px;
+}
+
+.rank-card-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+/* Discount Badge */
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: #28a745;
+    color: white;
+}
+
+/* Modal Styles */
+.modal-dialog {
+    max-width: 500px;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rank-management-container {
+        padding: 10px;
+    }
+
+    .rank-card-header {
+        padding: 10px;
+    }
+
+    .rank-card-body {
+        padding: 10px;
+    }
+
+    .rank-card-footer {
+        padding: 10px;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .rank-card-footer .btn {
+        width: 100%;
+    }
+}
+
+/* Pagination */
+.pagination-container {
+    margin-top: 20px;
+}
+
+.pagination .page-item .page-link {
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 4px;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0056b3;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.pagination .page-item .page-link:hover:not(.disabled) {
+    background-color: #e9ecef;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+} 

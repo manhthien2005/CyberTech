@@ -1,0 +1,21 @@
+<div id="zalo-chat-bubble" class="social-chat-bubble zalo-bubble">
+    <div class="bubble-trigger" onclick="openZaloChat()">
+        <span class="zalo-icon">Z</span>
+    </div>
+    <div class="bubble-tooltip">
+        <span>Chat Zalo</span>
+    </div>
+</div>
+
+<script>
+function openZaloChat() {
+    // Option 1: Deep link to Zalo with phone number
+    const zaloPhone = "0977139203"; // Thay số điện thoại thực tế
+    const zaloUrl = `https://zalo.me/${zaloPhone}`;
+    
+    // Option 2: Có thể dùng Zalo OA ID nếu có
+    // const zaloOAUrl = `https://page.zalo.me/[OA_ID]`;
+    
+    window.open(zaloUrl, '_blank');
+}
+</script> 

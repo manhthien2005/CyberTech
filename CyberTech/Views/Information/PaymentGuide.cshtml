@@ -1,0 +1,535 @@
+@{
+    ViewBag.Title = "Hướng dẫn thanh toán - CybotEcom";
+}
+
+<div class="payment-guide-page">
+    <div class="container">
+        <h1 class="page-title">Hướng dẫn thanh toán</h1>
+
+        <div class="guide-content">
+            <div class="intro-text">
+                <p>CybotEcom cung cấp nhiều phương thức thanh toán linh hoạt, an toàn và tiện lợi nhằm mang đến trải nghiệm mua sắm tốt nhất cho khách hàng. Dưới đây là hướng dẫn chi tiết về từng phương thức thanh toán.</p>
+            </div>
+
+            <div class="payment-methods">
+                <div class="payment-method" id="cod">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h2>Thanh toán khi nhận hàng (COD)</h2>
+                    </div>
+                    <div class="method-content">
+                        <div class="description">
+                            <p>Thanh toán khi nhận hàng (COD - Cash On Delivery) là phương thức thanh toán đơn giản và phổ biến nhất. Khách hàng chỉ cần thanh toán cho nhân viên giao hàng khi nhận được sản phẩm.</p>
+                        </div>
+                        <div class="steps">
+                            <h3>Các bước thực hiện:</h3>
+                            <ol>
+                                <li>Chọn phương thức "Thanh toán khi nhận hàng" khi thanh toán đơn hàng</li>
+                                <li>Nhận hàng và kiểm tra sản phẩm</li>
+                                <li>Thanh toán cho nhân viên giao hàng</li>
+                            </ol>
+                        </div>
+                        <div class="notes">
+                            <h3>Lưu ý:</h3>
+                            <ul>
+                                <li>Kiểm tra sản phẩm trước khi thanh toán</li>
+                                <li>Giữ lại biên lai thanh toán</li>
+                                <li>Phí thu hộ: Miễn phí</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method" id="bank-transfer">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h2>Chuyển khoản ngân hàng</h2>
+                    </div>
+                    <div class="method-content">
+                        <div class="description">
+                            <p>Chuyển khoản ngân hàng là phương thức thanh toán an toàn và được nhiều khách hàng lựa chọn. Bạn có thể thực hiện chuyển khoản qua Internet Banking, Mobile Banking hoặc tại quầy giao dịch.</p>
+                        </div>
+                        <div class="bank-info">
+                            <h3>Thông tin tài khoản:</h3>
+                            <div class="bank-accounts">
+                                <div class="bank-account">
+                                    <div class="bank-logo">Vietcombank</div>
+                                    <div class="account-details">
+                                        <p><strong>Tên TK:</strong> CÔNG TY TNHH CYBOTECOM</p>
+                                        <p><strong>Số TK:</strong> 1234567890</p>
+                                        <p><strong>Chi nhánh:</strong> TP. Hồ Chí Minh</p>
+                                    </div>
+                                </div>
+                                <div class="bank-account">
+                                    <div class="bank-logo">Techcombank</div>
+                                    <div class="account-details">
+                                        <p><strong>Tên TK:</strong> CÔNG TY TNHH CYBOTECOM</p>
+                                        <p><strong>Số TK:</strong> 0987654321</p>
+                                        <p><strong>Chi nhánh:</strong> TP. Hồ Chí Minh</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="steps">
+                            <h3>Các bước thực hiện:</h3>
+                            <ol>
+                                <li>Chọn phương thức "Chuyển khoản ngân hàng" khi thanh toán</li>
+                                <li>Ghi nhớ mã đơn hàng</li>
+                                <li>Thực hiện chuyển khoản với nội dung: <strong>Mã đơn hàng + Họ tên</strong></li>
+                                <li>Đơn hàng sẽ được xử lý sau khi nhận được thanh toán</li>
+                            </ol>
+                        </div>
+                        <div class="notes">
+                            <h3>Lưu ý:</h3>
+                            <ul>
+                                <li>Vui lòng ghi đúng nội dung chuyển khoản</li>
+                                <li>Chụp lại màn hình/biên lai chuyển khoản để đối chiếu khi cần</li>
+                                <li>Thời gian xử lý: 1-2 giờ làm việc</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method" id="atm-card">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h2>Thẻ ATM nội địa/Internet Banking</h2>
+                    </div>
+                    <div class="method-content">
+                        <div class="description">
+                            <p>Thanh toán qua thẻ ATM nội địa/Internet Banking là phương thức thanh toán nhanh chóng và an toàn. CybotEcom liên kết với VNPAY để hỗ trợ thanh toán qua 38 ngân hàng nội địa tại Việt Nam.</p>
+                        </div>
+                        <div class="bank-logos">
+                            <div class="logo-item">VCB</div>
+                            <div class="logo-item">TCB</div>
+                            <div class="logo-item">VIB</div>
+                            <div class="logo-item">MB</div>
+                            <div class="logo-item">ACB</div>
+                            <div class="logo-item">...và 33 ngân hàng khác</div>
+                        </div>
+                        <div class="steps">
+                            <h3>Các bước thực hiện:</h3>
+                            <ol>
+                                <li>Chọn phương thức "Thẻ ATM nội địa/Internet Banking" khi thanh toán</li>
+                                <li>Chọn ngân hàng bạn muốn thanh toán</li>
+                                <li>Hệ thống sẽ chuyển bạn đến cổng thanh toán VNPAY</li>
+                                <li>Đăng nhập Internet Banking hoặc nhập thông tin thẻ ATM</li>
+                                <li>Xác nhận thanh toán</li>
+                                <li>Hệ thống sẽ chuyển bạn về trang xác nhận đơn hàng</li>
+                            </ol>
+                        </div>
+                        <div class="notes">
+                            <h3>Lưu ý:</h3>
+                            <ul>
+                                <li>Cần đăng ký dịch vụ Internet Banking</li>
+                                <li>Thẻ ATM phải được kích hoạt chức năng thanh toán trực tuyến</li>
+                                <li>Phí thanh toán: Miễn phí</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method" id="credit-card">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <i class="far fa-credit-card"></i>
+                        </div>
+                        <h2>Thẻ tín dụng/ghi nợ quốc tế</h2>
+                    </div>
+                    <div class="method-content">
+                        <div class="description">
+                            <p>Thanh toán qua thẻ tín dụng/ghi nợ quốc tế là phương thức thanh toán nhanh chóng và được bảo mật cao. CybotEcom hỗ trợ thanh toán qua các loại thẻ Visa, Mastercard, JCB và American Express.</p>
+                        </div>
+                        <div class="card-logos">
+                            <div class="logo-item">Visa</div>
+                            <div class="logo-item">Mastercard</div>
+                            <div class="logo-item">JCB</div>
+                            <div class="logo-item">Amex</div>
+                        </div>
+                        <div class="steps">
+                            <h3>Các bước thực hiện:</h3>
+                            <ol>
+                                <li>Chọn phương thức "Thẻ tín dụng/ghi nợ quốc tế" khi thanh toán</li>
+                                <li>Nhập thông tin thẻ (số thẻ, tên chủ thẻ, ngày hết hạn, mã CVV)</li>
+                                <li>Xác nhận thanh toán</li>
+                                <li>Nhập mã OTP được gửi về điện thoại (nếu có)</li>
+                                <li>Hoàn tất thanh toán</li>
+                            </ol>
+                        </div>
+                        <div class="notes">
+                            <h3>Lưu ý:</h3>
+                            <ul>
+                                <li>Thông tin thẻ được bảo mật theo tiêu chuẩn PCI DSS</li>
+                                <li>CybotEcom không lưu trữ thông tin thẻ</li>
+                                <li>Phí thanh toán: Miễn phí</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method" id="e-wallet">
+                    <div class="method-header">
+                        <div class="method-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h2>Ví điện tử</h2>
+                    </div>
+                    <div class="method-content">
+                        <div class="description">
+                            <p>Thanh toán qua ví điện tử là phương thức thanh toán nhanh chóng, tiện lợi và được nhiều người sử dụng. CybotEcom hỗ trợ thanh toán qua các ví điện tử phổ biến tại Việt Nam.</p>
+                        </div>
+                        <div class="wallet-logos">
+                            <div class="logo-item">MoMo</div>
+                            <div class="logo-item">ZaloPay</div>
+                            <div class="logo-item">VNPay</div>
+                            <div class="logo-item">ShopeePay</div>
+                        </div>
+                        <div class="steps">
+                            <h3>Các bước thực hiện:</h3>
+                            <ol>
+                                <li>Chọn phương thức "Ví điện tử" khi thanh toán</li>
+                                <li>Chọn ví điện tử bạn muốn sử dụng</li>
+                                <li>Quét mã QR hoặc đăng nhập vào ứng dụng ví</li>
+                                <li>Xác nhận thanh toán trên ứng dụng ví</li>
+                                <li>Hoàn tất thanh toán</li>
+                            </ol>
+                        </div>
+                        <div class="notes">
+                            <h3>Lưu ý:</h3>
+                            <ul>
+                                <li>Cần cài đặt ứng dụng ví điện tử tương ứng</li>
+                                <li>Tài khoản ví cần có đủ số dư</li>
+                                <li>Phí thanh toán: Miễn phí</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section">
+                <h2>Câu hỏi thường gặp</h2>
+                <div class="faq-items">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi đã thanh toán nhưng không nhận được xác nhận?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>Trong một số trường hợp, việc xác nhận thanh toán có thể mất từ 1-2 giờ làm việc. Nếu sau thời gian này bạn vẫn chưa nhận được xác nhận, vui lòng liên hệ với chúng tôi qua hotline 0977 139 203 hoặc email support@cybotecom.com để được hỗ trợ.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi có thể thay đổi phương thức thanh toán sau khi đặt hàng không?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>Có, bạn có thể thay đổi phương thức thanh toán trước khi đơn hàng được xác nhận. Vui lòng liên hệ với chúng tôi qua hotline 0977 139 203 để được hỗ trợ thay đổi phương thức thanh toán.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Tôi bị trừ tiền nhưng đơn hàng không được xác nhận?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>Trong trường hợp này, vui lòng kiểm tra email xác nhận thanh toán từ ngân hàng hoặc ví điện tử. Sau đó, liên hệ với chúng tôi qua hotline 0977 139 203 hoặc email support@cybotecom.com và cung cấp thông tin thanh toán để chúng tôi kiểm tra và xử lý.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="support-section">
+                <h2>Hỗ trợ thanh toán</h2>
+                <p>Nếu bạn gặp bất kỳ khó khăn nào trong quá trình thanh toán, vui lòng liên hệ với chúng tôi qua các kênh sau:</p>
+                <div class="support-channels">
+                    <div class="support-channel">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Hotline</h3>
+                        <p>0977 139 203</p>
+                        <p>(8:00 - 21:00, cả T7 & CN)</p>
+                    </div>
+                    <div class="support-channel">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>support@cybotecom.com</p>
+                        <p>(Phản hồi trong vòng 24h)</p>
+                    </div>
+                    <div class="support-channel">
+                        <i class="fas fa-comments"></i>
+                        <h3>Chat trực tuyến</h3>
+                        <p>Trên website</p>
+                        <p>(8:00 - 21:00, cả T7 & CN)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .payment-guide-page {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .guide-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .payment-methods {
+            margin-bottom: 40px;
+        }
+
+        .payment-method {
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+        }
+
+        .method-icon {
+            width: 50px;
+            height: 50px;
+            background: #e3f2fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .method-icon i {
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+
+        .method-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+
+        .method-content {
+            padding: 20px;
+        }
+
+        .description {
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .bank-info, .steps, .notes {
+            margin-bottom: 20px;
+        }
+
+        .bank-accounts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .bank-account {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .bank-logo {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-right: 15px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .account-details p {
+            margin: 5px 0;
+        }
+
+        .bank-logos, .card-logos, .wallet-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .logo-item {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #555;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin: 15px 0 10px;
+            font-size: 1.2rem;
+        }
+
+        ol, ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        ol li, ul li {
+            margin-bottom: 8px;
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .faq-section h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .faq-question h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .faq-answer {
+            padding: 15px 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .support-section {
+            text-align: center;
+        }
+
+        .support-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .support-section > p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .support-channels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .support-channel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .support-channel i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .support-channel h3 {
+            margin-bottom: 10px;
+        }
+
+        .support-channel p {
+            color: #555;
+            margin: 5px 0;
+        }
+
+        @@media (max-width: 768px) {
+            .bank-account {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .bank-logo {
+                margin: 0 0 10px;
+            }
+        }
+
+        .placeholder-image {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ toggle
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    if (answer.style.display === 'block') {
+                        answer.style.display = 'none';
+                        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                    } else {
+                        answer.style.display = 'block';
+                        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                    }
+                });
+            });
+        });
+    </script>
+} 

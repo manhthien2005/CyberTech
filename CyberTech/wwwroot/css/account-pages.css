@@ -1,0 +1,319 @@
+/* Account Pages Common Styles */
+.account-container {
+    margin: 0 auto;
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+}
+
+.account-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    width: 100%;
+    min-width: 600px;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+}
+
+.account-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #0077cc, #17a2b8);
+}
+
+.account-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.account-header h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.account-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Form Styles */
+.account-form {
+    margin-bottom: 2rem;
+}
+
+.account-form .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+    width: 100%;
+}
+
+.account-form .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.account-form .form-control {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    height: auto;
+    min-height: 50px;
+}
+
+.account-form .form-control:focus {
+    border-color: #0077cc;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.account-form .form-text {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* Button Styles */
+.account-form .btn-account {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.account-form .btn-primary {
+    background: #0077cc;
+    color: #fff;
+}
+
+.account-form .btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* Social Login */
+.account-form .social-login {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.account-form .social-login-title {
+    position: relative;
+    margin-bottom: 1.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.account-form .social-login-title::before,
+.account-form .social-login-title::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: #ddd;
+}
+
+.account-form .social-login-title::before {
+    left: 0;
+}
+
+.account-form .social-login-title::after {
+    right: 0;
+}
+
+.account-form .social-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.account-form .social-btn {
+    flex: 1;
+    padding: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    min-height: 50px;
+}
+
+.account-form .btn-google {
+    background: #fff;
+    border: 2px solid #ddd;
+    color: #333;
+}
+
+.account-form .btn-google:hover {
+    background: #f8f9fa;
+    border-color: #333;
+}
+
+.account-form .btn-facebook {
+    background: #1877f2;
+    color: #fff;
+}
+
+.account-form .btn-facebook:hover {
+    background: #166fe5;
+}
+
+/* Links */
+.account-form .account-links {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.account-form .account-links a {
+    color: #0077cc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.account-form .account-links a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Alert Messages */
+.account-form .alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.account-form .alert i {
+    font-size: 1.25rem;
+}
+
+.account-form .alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.account-form .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.account-form .alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.account-form .alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Password Input Styles */
+.password-input-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #0077cc;
+}
+
+.password-toggle:focus {
+    outline: none;
+}
+
+.password-input-group .form-control {
+    padding-right: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .account-container {
+        padding: 20px;
+    }
+
+    .account-card {
+        padding: 1.5rem;
+    }
+
+    .account-form .social-buttons {
+        flex-direction: column;
+    }
+
+    .account-header h2 {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .account-card {
+        padding: 1.25rem;
+    }
+
+    .account-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .account-form .form-control {
+        padding: 0.625rem 0.875rem;
+    }
+
+    .account-form .btn-account {
+        padding: 0.75rem;
+    }
+} 
