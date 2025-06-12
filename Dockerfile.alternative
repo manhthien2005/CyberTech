@@ -1,14 +1,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
+# Chuẩn bị môi trường build
+RUN apt-get update && apt-get install -y curl
+
 # Copy everything
 COPY . ./
 
-# Restore as distinct layers
-RUN dotnet restore CyberTech/CyberTechShop.csproj
+# Xóa bin và obj để đảm bảo clean build
+RUN rm -rf /app/CyberTech/bin /app/CyberTech/obj
 
-# Build and publish a release
-RUN dotnet publish CyberTech/CyberTechShop.csproj -c Release -o out
+# Restore as distinct layers - với verbose để xem lỗi chi tiết
+RUN dotnet restore CyberTech/CyberTechShop.csproj --verbosity detailed
+
+# Build and publish a release - với verbose để xem lỗi chi tiết
+RUN dotnet publish CyberTech/CyberTechShop.csproj -c Release -o out --verbosity detailed || (echo "Build failed. Showing detailed error:" && cat /tmp/msbuild*.log && exit 1)
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

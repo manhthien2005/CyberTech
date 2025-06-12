@@ -1,8 +1,9 @@
 [build]
 builder = "DOCKERFILE"
 # dockerfilePath = "Dockerfile"
-# Nếu Dockerfile chính không hoạt động, đổi thành:
-dockerfilePath = "Dockerfile.alternative"
+# dockerfilePath = "Dockerfile.alternative"
+# Sử dụng Dockerfile đơn giản nhất:
+dockerfilePath = "Dockerfile.simple"
 
 [deploy]
 healthcheckPath = "/Home/Index"

@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Copy pre-built application
+COPY ./publish/ ./
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["dotnet", "CyberTechShop.dll"] 
